@@ -58,6 +58,7 @@ public:
 	void addEdge(MapEdge* mapEdge);
 	bool isContinent();
 	bool validate(int min);
+	void setParent(Territory* parent);
 
 private:
 	// defines type
@@ -66,6 +67,8 @@ private:
 	vector<Territory*>* vertices;
 	// connections is other nodes this node is connected to
 	vector<MapEdge*>* connections;
+	// 
+	Territory* parent;
 
 	/*
 	* Territory's individual characteristics

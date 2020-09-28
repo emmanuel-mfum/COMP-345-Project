@@ -12,6 +12,8 @@ int main() {
 	string* na = new string("North America");
 	string* ca = new string("Canada");
 	string* us = new string("United States");
+	string* eu = new string("Europe");
+	string* fr = new string("France");
 
 	Map* m = new Map(*mn);
 
@@ -22,6 +24,12 @@ int main() {
 	m->addCountry(*na, *us);
 	// add edge between countries, requires countries to be registered on the map
 	m->addEdge(*ca, *us);
+
+	m->addContinent(*eu);
+	// once multiple continents on the map, the continents need to be connected subgraphs, so connect them
+	m->addEdge(*eu, *na);
+	
+	m->addCountry(*eu, *fr);
 
 	// validate
 	bool isValidMap = m->validate();
