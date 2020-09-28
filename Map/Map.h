@@ -59,6 +59,7 @@ public:
 	bool isContinent();
 	bool validate(int min);
 	void setParent(Territory* parent);
+	void setPlayerOwnership(int playerId);
 
 private:
 	// defines type
@@ -67,8 +68,10 @@ private:
 	vector<Territory*>* vertices;
 	// connections is other nodes this node is connected to
 	vector<MapEdge*>* connections;
-	// 
+	// parent is applicable when territory is country, parent will be continent containing the country
 	Territory* parent;
+	// playerId is used to indicate ownership of territory by a player, applicable to countries
+	int* ownerId;
 
 	/*
 	* Territory's individual characteristics
@@ -111,4 +114,6 @@ public:
 	void addVertex(Territory* territory);
 
 	bool validate();
+
+	void setPlayerOwnership(int playerId, string territoryName);
 };

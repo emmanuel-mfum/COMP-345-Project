@@ -149,6 +149,13 @@ bool Map::validate() {
 	return true;
 }
 
+void Map::setPlayerOwnership(int playerId, string territoryName) {
+	if (this->territoryExists(territoryName)) {
+		Territory* terr = this->mapTerritories->at(this->findTerritory(territoryName));
+		terr->setPlayerOwnership(playerId);
+	}
+}
+
 
 
 
@@ -175,6 +182,7 @@ Territory::Territory(const TerritoryType &territoryType, string territoryName) {
 	this->territoryType = &(TerritoryType(territoryType));
 	this->territoryName = new string(territoryName);
 	this->parent = nullptr;
+	this->ownerId = nullptr;
 
 	if ((*this->territoryType) == TerritoryType::Continent) {
 		this->territoryType = new TerritoryType{ TerritoryType::Continent };
@@ -209,6 +217,10 @@ bool Territory::validate(int min) {
 
 void Territory::setParent(Territory* parent) {
 	this->parent = parent;
+}
+
+void Territory::setPlayerOwnership(int playerId) {
+	this->ownerId = new int(playerId);
 }
 
 

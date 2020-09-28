@@ -31,6 +31,8 @@ int main() {
 	
 	m->addCountry(*eu, *fr);
 
+	m->setPlayerOwnership(25, *fr);
+
 	// validate
 	bool isValidMap = m->validate();
 
