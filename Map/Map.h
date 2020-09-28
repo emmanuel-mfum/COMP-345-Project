@@ -1,6 +1,9 @@
 #pragma once
 
 #include <string>
+#include <vector>
+
+
 using namespace std;
 /**
 *
@@ -8,65 +11,17 @@ using namespace std;
 *
 */
 
+// let the compiler know these classes are defined in this file
+class MapEdge;
+class Territory;
+class Map;
 
 
-
-
-/**
-*
-* Map class is the object that holds information about continents
-*/
-class Map {
-public:
-	Map() {
-
-	}
-
-	~Map() {
-
-	}
-
-private:
-	static int* mapId;
-
-	string* mapName;
-	Territory* vertices;
-	MapEdge* edges;
-}
-
-
-/*
-*
-* Territory is the class that represents a vertex in the graph
-*/
-class Territory {
-public:
-	Territory(const TerritoryType &territoryType, string territoryName) {}
-
-	~Territory() {
-
-	}
-
-private:
-	// defines type
-	TerritoryType* territoryType;
-	// vertices is subgraph. . . . will only apply if territory is a continent, or if country definition is expanded to contain regions
-	Territory* vertices;
-	// connections is other nodes this node is connected to
-	Territory* connections;
-
-	/*
-	* Territory's individual characteristics
-	*/
-	string* territoryName;
-}
-
-
-
-enum TerritoryType {
-	Country=1,
-	Continent=2,
+enum class TerritoryType {
+	Country = 1,
+	Continent = 2,
 };
+
 
 
 
@@ -77,11 +32,76 @@ enum TerritoryType {
 */
 class MapEdge {
 public:
-	MapEdge() {
+	MapEdge(Territory* territoryOne, Territory* territoryTwo);
 
-	}
+	~MapEdge();
 
-	~MapEdge() {
+private:
+	Territory* territoryOne;
+	Territory* territoryTwo;
+};
 
-	}
-}
+
+/*
+*
+* Territory is the class that represents a vertex in the graph
+*/
+class Territory {
+public:
+	Territory();
+	Territory(const TerritoryType& territoryType, string territoryName);
+
+	~Territory();
+
+	bool territoryNameMatches(string territoryName);
+	void addVertex(const Territory& territory);
+	void addEdge(const MapEdge& mapEdge);
+
+private:
+	// defines type
+	TerritoryType* territoryType;
+	// vertices is subgraph. . . . will only apply if territory is a continent, or if country definition is expanded to contain regions
+	vector<Territory>* vertices;
+	// connections is other nodes this node is connected to
+	vector<MapEdge>* connections;
+
+	/*
+	* Territory's individual characteristics
+	*/
+	string* territoryName;
+};
+
+
+
+
+
+
+/**
+*
+* Map class is the object that holds information about continents
+*/
+class Map {
+private:
+	string* mapName;
+	vector<Territory>* vertices;
+	vector<MapEdge>* edges;
+	vector<Territory>* mapTerritories;
+
+	int findTerritory(string territoryName);
+
+public:
+	Map(string mapName);
+	~Map();
+
+	bool territoryExists(string territoryName);
+
+	void addTerritory(const TerritoryType& territoryType, string territoryName);
+
+	void addCountry(string continentName, string territoryName);
+
+	void addEdge(string territoryNameOne, string territoryNameTwo);
+
+	void addContinent(string continentName);
+
+	void Map::addVertex(const Territory& territory);
+};
