@@ -93,7 +93,7 @@ void Map::addVertex(Territory* territory) {
 }
 
 int Map::findTerritory(string territoryName) {
-	// find the index of the territory
+	// find the territory
 	for (int i = 0; i < this->mapTerritories->size(); i++) {
 		if (this->mapTerritories->at(i)->territoryNameMatches(territoryName)) {
 			return i;
@@ -116,8 +116,6 @@ bool Map::validate() {
 		}
 	}
 
-	// check each territory, make sure each territory has the minimum number of connections
-	// (0 if there is only one territory of the type, 1 otherwise)
 	for (int i = 0, j = 0, k = 0; i < this->mapTerritories->size(); i++) {
 		int min = 1;
 		vector<Territory*>* terrs = nullptr;

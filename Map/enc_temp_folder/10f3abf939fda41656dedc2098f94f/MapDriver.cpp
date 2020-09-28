@@ -15,15 +15,12 @@ int main() {
 
 	Map* m = new Map(*mn);
 
-	// add continents, and countries
-	// continent needs to be added before countries on that continent are added
 	m->addContinent(*na);
 	m->addCountry(*na, *ca);
 	m->addCountry(*na, *us);
-	// add edge between countries, requires countries to be registered on the map
+
 	m->addEdge(*ca, *us);
 
-	// validate
 	bool isValidMap = m->validate();
 
 	std::cout << "END!" << endl;

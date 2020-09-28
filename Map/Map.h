@@ -54,16 +54,18 @@ public:
 	~Territory();
 
 	bool territoryNameMatches(string territoryName);
-	void addVertex(const Territory& territory);
-	void addEdge(const MapEdge& mapEdge);
+	void addVertex(Territory* territory);
+	void addEdge(MapEdge* mapEdge);
+	bool isContinent();
+	bool validate(int min);
 
 private:
 	// defines type
 	TerritoryType* territoryType;
 	// vertices is subgraph. . . . will only apply if territory is a continent, or if country definition is expanded to contain regions
-	vector<Territory>* vertices;
+	vector<Territory*>* vertices;
 	// connections is other nodes this node is connected to
-	vector<MapEdge>* connections;
+	vector<MapEdge*>* connections;
 
 	/*
 	* Territory's individual characteristics
@@ -83,9 +85,9 @@ private:
 class Map {
 private:
 	string* mapName;
-	vector<Territory>* vertices;
-	vector<MapEdge>* edges;
-	vector<Territory>* mapTerritories;
+	vector<Territory*>* vertices;
+	vector<MapEdge*>* edges;
+	vector<Territory*>* mapTerritories;
 
 	int findTerritory(string territoryName);
 
@@ -103,5 +105,7 @@ public:
 
 	void addContinent(string continentName);
 
-	void Map::addVertex(const Territory& territory);
+	void addVertex(Territory* territory);
+
+	bool validate();
 };
