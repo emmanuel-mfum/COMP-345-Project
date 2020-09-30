@@ -33,8 +33,11 @@ enum class TerritoryType {
 class MapEdge {
 public:
 	MapEdge(Territory* territoryOne, Territory* territoryTwo);
-
+	MapEdge(const MapEdge& source);
+	
 	~MapEdge();
+
+	MapEdge& operator=(const MapEdge& rhs);
 
 private:
 	Territory* territoryOne;
@@ -48,10 +51,12 @@ private:
 */
 class Territory {
 public:
-	Territory();
 	Territory(const TerritoryType& territoryType, string territoryName);
+	Territory(const Territory& source);
 
 	~Territory();
+
+	Territory& operator=(const Territory& rhs);
 
 	bool territoryNameMatches(string territoryName);
 	void addVertex(Territory* territory);
@@ -60,6 +65,8 @@ public:
 	bool validate(int min);
 	void setParent(Territory* parent);
 	void setPlayerOwnership(int playerId);
+	string getTerritoryName();
+	TerritoryType getTerritoryType();
 
 private:
 	// defines type
@@ -68,15 +75,15 @@ private:
 	vector<Territory*>* vertices;
 	// connections is other nodes this node is connected to
 	vector<MapEdge*>* connections;
-	// parent is applicable when territory is country, parent will be continent containing the country
-	Territory* parent;
-	// playerId is used to indicate ownership of territory by a player, applicable to countries
-	int* ownerId;
 
 	/*
 	* Territory's individual characteristics
 	*/
 	string* territoryName;
+	// parent is applicable when territory is country, parent will be continent containing the country
+	Territory* parent;
+	// playerId is used to indicate ownership of territory by a player, applicable to countries
+	int* ownerId;
 };
 
 
@@ -89,6 +96,27 @@ private:
 * Map class is the object that holds information about continents
 */
 class Map {
+public:
+	Map(string mapName);
+	Map(const Map& source);
+
+	~Map();
+
+	Map& operator=(const Map& rhs);
+
+	bool territoryExists(string territoryName);
+	void addTerritoryByName(const TerritoryType& territoryType, string territoryName);
+	void addTerritoryByReference(Territory* territory);
+	void addCountryByName(string continentName, string territoryName);
+	void addCountryByReference(Territory* continent, Territory* country);
+	void addEdgeByName(string territoryNameOne, string territoryNameTwo);
+	void addEdgeByReference(Territory* territoryOne, Territory* territoryTwo);
+	void addContinentByName(string continentName);
+	void addContinentByReference(Territory* continent);
+	void addVertex(Territory* territory);
+	bool validate();
+	void setPlayerOwnership(int playerId, string territoryName);
+
 private:
 	string* mapName;
 	vector<Territory*>* vertices;
@@ -96,24 +124,4 @@ private:
 	vector<Territory*>* mapTerritories;
 
 	int findTerritory(string territoryName);
-
-public:
-	Map(string mapName);
-	~Map();
-
-	bool territoryExists(string territoryName);
-
-	void addTerritory(const TerritoryType& territoryType, string territoryName);
-
-	void addCountry(string continentName, string territoryName);
-
-	void addEdge(string territoryNameOne, string territoryNameTwo);
-
-	void addContinent(string continentName);
-
-	void addVertex(Territory* territory);
-
-	bool validate();
-
-	void setPlayerOwnership(int playerId, string territoryName);
 };
