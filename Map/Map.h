@@ -67,6 +67,7 @@ public:
 	void setPlayerOwnership(int playerId);
 	string getTerritoryName();
 	TerritoryType getTerritoryType();
+	string getContinentName();
 
 private:
 	// defines type

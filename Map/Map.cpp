@@ -202,14 +202,19 @@ bool Map::validate() {
 	vector<vector<Territory*>*>* countriesByContinent = new vector<vector<Territory*>*>;
 
 	// classify the territories
-	for (int i = 0, k = -1; i < this->mapTerritories->size(); i++) {
+	for (int i = 0; i < this->mapTerritories->size(); i++) {
 		if (this->mapTerritories->at(i)->isContinent()) {
 			continents->push_back(this->mapTerritories->at(i));
 			countriesByContinent->push_back(new vector<Territory*>);
-			k++;
 		}
 		else {
-			countriesByContinent->at(k)->push_back(this->mapTerritories->at(i));
+			int j;
+			for (j = 0; j < continents->size(); j++) {
+				if (continents->at(j)->getTerritoryName().compare(this->mapTerritories->at(i)->getContinentName()) == 0) {
+					break;
+				}
+			}
+			countriesByContinent->at(j)->push_back(this->mapTerritories->at(i));
 		}
 	}
 
@@ -219,7 +224,7 @@ bool Map::validate() {
 	// check each territory, make sure each territory has the minimum number of connections
 	// (0 if there is only one territory of the type, 1 otherwise)
 	// have to deal with case when country belongs to continent, but it is the only country belonging to the continent
-	for (int i = 0, j = 0, k = 0, l = -1; i < this->mapTerritories->size(); i++) {
+	for (int i = 0, j = 0, k = 0; i < this->mapTerritories->size(); i++) {
 		int min = 1;
 		vector<Territory*>* terrs = nullptr;
 		if (this->mapTerritories->at(i)->isContinent()) {
@@ -229,9 +234,14 @@ bool Map::validate() {
 				return false;
 			}
 			j++;
-			l++;
 		}
 		else {
+			int l;
+			for (l = 0; l < continents->size(); l++) {
+				if (continents->at(l)->getTerritoryName().compare(this->mapTerritories->at(i)->getContinentName()) == 0) {
+					break;
+				}
+			}
 			min = (countriesByContinent->at(l)->size() > 1) ? min : 0;
 			Territory* terr = countriesByContinent->at(l)->at(currentIdxs.at(l));
 			if (!terr->validate(min)) {
@@ -395,6 +405,10 @@ string Territory::getTerritoryName() {
 TerritoryType Territory::getTerritoryType() {
 	// give back a copy
 	return *new TerritoryType(*this->territoryType);
+}
+
+string Territory::getContinentName() {
+	return this->parent->getTerritoryName();
 }
 
 
