@@ -16,6 +16,10 @@ int main() {
 	Territory* uk = new Territory(TerritoryType::Country, "United Kingdom");
 	Territory* canada = new Territory(TerritoryType::Country, "Canada");
 	Territory* northAmerica = new Territory(TerritoryType::Continent, "North America");
+	Territory* kenya = new Territory(TerritoryType::Country, "Kenya");
+	Territory* ethiopia = new Territory(TerritoryType::Country, "Ethiopia");
+	Territory* africa = new Territory(TerritoryType::Continent, "Africa");
+	Territory* germany = new Territory(TerritoryType::Country, "Germany");
 
 
 	// add continents, and countries
@@ -42,6 +46,29 @@ int main() {
 	m->addEdgeByReference(france, uk);
 	// validate
 	// true because the countries on the same continent are now connected!!
+	isValidMap = m->validate();
+
+	m->addContinentByReference(africa);
+	m->addCountryByReference(europe, germany);
+	m->addCountryByReference(africa, kenya);
+	m->addCountryByReference(africa, ethiopia);
+	// validate
+	// false because none of new objects connected!!
+	isValidMap = m->validate();
+
+	m->addEdgeByReference(ethiopia, kenya);
+
+	// false because africa not part of continent graph, germany not part of europe graph!!
+	isValidMap = m->validate();
+
+	m->addEdgeByReference(africa, europe);
+
+	// false because germany not part of europe graph!!
+	isValidMap = m->validate();
+
+	m->addEdgeByReference(germany, france);
+
+	// true!!!!
 	isValidMap = m->validate();
 
 	std::cout << "END!" << endl;
