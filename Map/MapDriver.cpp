@@ -68,6 +68,10 @@ int main() {
 
 	m->addEdgeByReference(germany, france);
 
+	m->setPlayerOwnership(25, "ethiopia");
+
+	m->setPlayerOwnership(41, "germany");
+
 	// true!!!!
 	isValidMap = m->validate();
 
