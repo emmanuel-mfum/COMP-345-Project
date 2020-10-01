@@ -75,5 +75,13 @@ int main() {
 	// true!!!!
 	isValidMap = m->validate();
 
+	std::cout << *m;
+
+	cout << *africa;
+	cout << *northAmerica;
+	cout << *europe;
+	cout << *canada;
+	cout << *kenya;
+
 	std::cout << "END!" << endl;
 }

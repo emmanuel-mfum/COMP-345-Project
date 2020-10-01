@@ -39,6 +39,9 @@ public:
 
 	MapEdge& operator=(const MapEdge& rhs);
 
+	friend std::ostream& operator<<(std::ostream& out, const MapEdge& toOut);
+
+
 private:
 	Territory* territoryOne;
 	Territory* territoryTwo;
@@ -57,6 +60,8 @@ public:
 	~Territory();
 
 	Territory& operator=(const Territory& rhs);
+
+	friend ostream& operator<<(ostream& out, const Territory& toOut);
 
 	bool territoryNameMatches(string territoryName);
 	void addVertex(Territory* territory);
@@ -105,6 +110,8 @@ public:
 
 	Map& operator=(const Map& rhs);
 
+	friend std::ostream& operator<<(std::ostream& out, const Map& toOut);
+
 	bool territoryExists(string territoryName);
 	void addTerritoryByName(const TerritoryType& territoryType, string territoryName);
 	void addTerritoryByReference(Territory* territory);
@@ -117,6 +124,9 @@ public:
 	void addVertex(Territory* territory);
 	bool validate();
 	void setPlayerOwnership(int playerId, string territoryName);
+
+	string const& getDisplayStringForOut() const;
+	string getDisplayString();
 
 private:
 	string* mapName;

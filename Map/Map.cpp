@@ -1,5 +1,6 @@
 #include <string>
 #include <vector>
+#include <iostream>
 #include "Map.h"
 
 
@@ -78,6 +79,15 @@ Map& Map::operator=(const Map& rhs) {
 	}
 
 	return *this;
+}
+
+std::ostream& operator<<(std::ostream& out, const Map& toOut) {
+	out << "\n===================================\n";
+	out << "MAP: " + *toOut.mapName;
+	out << "\n  Continents: " + to_string(toOut.vertices->size());
+	out << "\n  Countries: " + to_string((toOut.mapTerritories->size() - toOut.vertices->size()));
+	out << "\n===================================\n\n";
+	return out;
 }
 
 bool Map::territoryExists(string territoryName) {
@@ -260,6 +270,24 @@ void Map::setPlayerOwnership(int playerId, string territoryName) {
 	}
 }
 
+string const& Map::getDisplayStringForOut() const {
+	string displayString = "\n===================================\n";
+	displayString.append("MAP: " + *this->mapName);
+	displayString.append("\n  Continents: " + to_string(this->vertices->size()));
+	displayString.append("\n  Countries: " + to_string((this->mapTerritories->size() - this->vertices->size())));
+	displayString.append("\n===================================\n\n");
+	return displayString;
+}
+
+string Map::getDisplayString() {
+	string displayString = "\n===================================\n";
+	displayString.append("MAP: " + *this->mapName);
+	displayString.append("\n  Continents: " + to_string(this->vertices->size()));
+	displayString.append("\n  Countries: " + to_string((this->mapTerritories->size() - this->vertices->size())));
+	displayString.append("\n===================================\n\n");
+	return displayString;
+}
+
 
 
 
@@ -320,7 +348,31 @@ Territory::Territory(const Territory& source) {
 }
 
 Territory::~Territory() {
+	delete this->territoryName;
+	delete this->territoryType;
+	delete this->vertices;
+	delete this->connections;
+	delete this->parent;
+	delete this->ownerId;
+}
 
+
+ostream& operator<<(ostream& out, const Territory& toOut) {
+	if (*toOut.territoryType == TerritoryType::Continent) {
+		cout << "\n============================\n";
+		cout << "Continent: " << *toOut.territoryName << endl;
+		cout << "  Constituent countries: " << to_string(toOut.vertices->size()) << endl;
+		cout << "  Accessible continents: " << to_string(toOut.connections->size()) << endl;
+		cout << "============================\n";
+	}
+	else {
+		cout << "\n============================\n";
+		cout << "Country: " << *toOut.territoryName << endl;
+		cout << "  Member of: " << toOut.parent->getTerritoryName() << endl;
+		cout << "  Accessible countries: " << to_string(toOut.connections->size()) << endl;
+		cout << "============================\n";
+	}
+	return out;
 }
 
 Territory& Territory::operator=(const Territory& rhs) {
@@ -425,7 +477,8 @@ MapEdge::MapEdge(Territory* territoryOne, Territory* territoryTwo) {
 }
 
 MapEdge::~MapEdge() {
-
+	delete this->territoryOne;
+	delete this->territoryTwo;
 }
 
 MapEdge::MapEdge(const MapEdge& source) {
@@ -445,4 +498,11 @@ MapEdge& MapEdge::operator=(const MapEdge& rhs) {
 	// create new references
 	this->territoryOne = rhs.territoryOne;
 	this->territoryTwo = rhs.territoryTwo;
+	return *this;
+}
+
+ostream& operator<<(ostream& out, const MapEdge& toOut) {
+	out << "Edge:: FROM <> TO" << endl;
+	out << toOut.territoryOne->getTerritoryName() << " <-----------> " << toOut.territoryTwo->getTerritoryName() << endl;
+	return out;
 }
