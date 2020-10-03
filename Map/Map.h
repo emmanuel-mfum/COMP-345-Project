@@ -41,6 +41,8 @@ public:
 
 	friend std::ostream& operator<<(std::ostream& out, const MapEdge& toOut);
 
+	Territory* getAdjacentTerritory(string territoryName);
+
 
 private:
 	Territory* territoryOne;
@@ -73,6 +75,7 @@ public:
 	string getTerritoryName();
 	TerritoryType getTerritoryType();
 	string getContinentName();
+	vector<Territory*>* getAdjacentTerritories();
 
 private:
 	// defines type
@@ -123,7 +126,7 @@ public:
 	void addContinentByReference(Territory* continent);
 	void addVertex(Territory* territory);
 	bool validate();
-	void setPlayerOwnership(int playerId, string territoryName);
+	Territory* setPlayerOwnership(int playerId, string territoryName);
 
 	string const& getDisplayStringForOut() const;
 	string getDisplayString();

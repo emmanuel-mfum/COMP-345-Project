@@ -1,6 +1,7 @@
 #include <string>
 #include <iostream>
-#include "Map.h"
+#include "../Map/Map.h"
+#include "../Player/player.h"
 
 using namespace std;
 
@@ -68,9 +69,9 @@ int main() {
 
 	m->addEdgeByReference(germany, france);
 
-	m->setPlayerOwnership(25, "ethiopia");
+	Territory* e = m->setPlayerOwnership(25, "Ethiopia");
 
-	m->setPlayerOwnership(41, "germany");
+	Territory* g = m->setPlayerOwnership(41, "Germany");
 
 	// true!!!!
 	isValidMap = m->validate();
@@ -82,6 +83,12 @@ int main() {
 	cout << *europe;
 	cout << *canada;
 	cout << *kenya;
+	cout << *e;
+
+	Player::setMap(m);
+
+	Player* aPlayer = new Player();
+	aPlayer->declareOwner("France");
 
 	std::cout << "END!" << endl;
 }

@@ -263,11 +263,14 @@ bool Map::validate() {
 	return true;
 }
 
-void Map::setPlayerOwnership(int playerId, string territoryName) {
+Territory* Map::setPlayerOwnership(int playerId, string territoryName) {
 	if (this->territoryExists(territoryName)) {
 		Territory* terr = this->mapTerritories->at(this->findTerritory(territoryName));
 		terr->setPlayerOwnership(playerId);
+		// return territory if found
+		return terr;
 	}
+	return nullptr;
 }
 
 string const& Map::getDisplayStringForOut() const {
@@ -463,6 +466,18 @@ string Territory::getContinentName() {
 	return this->parent->getTerritoryName();
 }
 
+vector<Territory*>* Territory::getAdjacentTerritories() {
+	vector<Territory*>* adjacentTerritories = new vector<Territory*>;
+	// loop through all the connections this territory has
+	for (int i = 0; i < this->connections->size(); i++) {
+		MapEdge* edge = this->connections->at(i);
+		// get the other territory participating in the connection that is not this territory
+		Territory* adjacentTerr = edge->getAdjacentTerritory(*this->territoryName);
+		adjacentTerritories->push_back(adjacentTerr);
+	}
+	return adjacentTerritories;
+}
+
 
 
 
@@ -505,4 +520,14 @@ ostream& operator<<(ostream& out, const MapEdge& toOut) {
 	out << "Edge:: FROM <> TO" << endl;
 	out << toOut.territoryOne->getTerritoryName() << " <-----------> " << toOut.territoryTwo->getTerritoryName() << endl;
 	return out;
+}
+
+
+Territory* MapEdge::getAdjacentTerritory(string territoryName) {
+	if (this->territoryOne->getTerritoryName().compare(territoryName) == 0) {
+		return this->territoryTwo;
+	}
+	else {
+		return this->territoryOne;
+	}
 }
