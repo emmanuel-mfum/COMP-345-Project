@@ -15,6 +15,7 @@ private:
     static Map* worldMap;
 
     int* playerId;
+    int* armies;
 
     vector<Territory*>* ownedTerritories;
 
@@ -31,6 +32,7 @@ public:
     // i don't think you should pass the player as an argument, it is a member function of the player class 
     // this method just needs to loop through the list of territories the player owns, and call getAdjacentTerritories on that territory!
     // build a list of those adjacent territories and return them!
+
     void toAttack(Player* pl);
     void issueOrder();
 
