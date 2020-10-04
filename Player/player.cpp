@@ -39,7 +39,7 @@ void Player::toDefend(){
      *build a list of those adjacent territories and return them!
      */
 void Player::toAttack(){
-    for(int i=0;i<this->ownedTerritories->size();i++){
+    for(int i=0;this->ownedTerritories->at(i)->getAdjacentTerritories();i++){
         return getAdjacentTerritories();
 
     }
