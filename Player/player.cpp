@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 
-#include "Player.h"
+#include "player.h"
 #include "../Map/Map.h"
 
 
@@ -16,13 +16,29 @@ Map* Player::worldMap = nullptr;
 Player::Player(){
     this->armies = 0;
     this->playerId = new int(245);
-    this->ownedTerritories = new vector<Territory*>;
+    this->ownedTerritories = new vector<Territory*>;   
+}
+int Player::getArmies(){
+   this->armies;
 }
 
+int Player::getPlayerId(){
+    this->playerId;
+}
+
+
+// this method can just return the list of territories the player owns!
 void Player::toDefend(){
-
+   cout<<"The list of territories owned by the player "<<playerId<<":"<<endl;
+   this->ownedTerritories;
 }
-void Player::toAttack(Player *pl){
+    /*
+     *this method can just return the list of territories adjacent to the territories the player owns!
+     *i don't think you should pass the player as an argument, it is a member function of the player class 
+     *this method just needs to loop through the list of territories the player owns, and call getAdjacentTerritories on that territory!
+     *build a list of those adjacent territories and return them!
+     */
+void Player::toAttack(){
     
 }
 
@@ -33,6 +49,7 @@ void Player::declareOwner(string countryName) {
     Territory* ownedTerritory = worldMap->setPlayerOwnership(*this->playerId, countryName);
 
     // HERE: just need to add ownedTerritory to this players list of owned territories
+
 }
 
 
