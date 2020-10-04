@@ -1,5 +1,5 @@
 #include <iostream>
-#include "Player.h"
+#include "player.h"
 #include "../Map/Map.h"
 
 using namespace std;
@@ -45,4 +45,5 @@ int main() {
 	// all player objects can now call member functions 
 	Player* aPlayer = new Player();
 	aPlayer->declareOwner("Canada");
+	
 }

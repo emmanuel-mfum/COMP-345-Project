@@ -27,7 +27,7 @@ public:
     void toDefend();
     void toAttack();
     void issueOrder();
-
+    void getAdjacentTerritories();
     void declareOwner(string countryName);
 
     // need to implement a setter method

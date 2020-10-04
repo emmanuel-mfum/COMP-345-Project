@@ -39,7 +39,10 @@ void Player::toDefend(){
      *build a list of those adjacent territories and return them!
      */
 void Player::toAttack(){
-    
+    for(int i=0;i<this->ownedTerritories->size();i++){
+        return getAdjacentTerritories();
+
+    }
 }
 
 void Player::declareOwner(string countryName) {
