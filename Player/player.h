@@ -24,9 +24,10 @@ public:
     Player();
     int getArmies();
     int getPlayerId();
-    void toDefend();
-    void toAttack();
+    vector<Territory*> toDefend();
+    vector<Territory*> toAttack();
     void issueOrder();
+    // i don't think you need this method
     void getAdjacentTerritories();
     void declareOwner(string countryName);
 
