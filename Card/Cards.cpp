@@ -14,6 +14,8 @@ Card::Card() {
 
 }
 Card::Card(string t) {
+	// Maybe you should check to make sure the string is one of the proper types?
+	// although if only the Deck is going to create a card that's probably not an issue
 	 type = t; // set the type at creation
 }
 
@@ -61,7 +63,9 @@ void Deck::shuffleDeck() { // randomizes the deck
 Card Deck::draw()
 {
 	cout << "The player will draw a card" << endl;
-	 
+	
+	// the assignment says random card, would it be possible to randomize this somehow?
+
 	Card a = cards.back();// stores the card from the back of the deck
 	cards.pop_back(); // remove the last card (the one just taken)
 	cout << "The size of the deck is now " << cards.size() << endl; // indicates the remaining numbers of cards in the deck
@@ -98,6 +102,7 @@ void Hand::pickCard(Card c) {
 
 
  Card Hand::removeFromHand(int index) {
+
 	int i = index;
 	Card b = cards.at(i);
 	cards.erase(cards.begin() + i);
