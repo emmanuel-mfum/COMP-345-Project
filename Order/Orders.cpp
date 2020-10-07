@@ -5,6 +5,20 @@
 
 using namespace std;
 
+/*
+* 
+* Visual Studio is showing me a lot of errors for this file....
+* 
+* I don't think you need to define the methods for each class. 
+* Just define it in the base class and you can use it in the other classes?
+* 
+* You can't do ClassName.methodName()
+* If you want to use a static function, its like ClassName::methodName()
+* If you want to use a member method on an instance of a class from within a non-static function
+* you can do this->methodName()
+* 
+*/
+
 void OrderList::Delete(Order or){
     cout<<"Delete object form list"<<endl;
 }
