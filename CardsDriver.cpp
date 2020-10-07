@@ -8,7 +8,7 @@ using namespace std;
 int main() {
 
 
-	Deck* deck = new Deck();
+	Deck deck;
 
 	
 
