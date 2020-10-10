@@ -12,7 +12,6 @@ class Player {
 private:
     // declare a static Map so all players can see it
     static Map* worldMap;
-
     int* playerId;
     int* armies;
 
@@ -21,14 +20,22 @@ private:
 
 
 public:
+    //constructor
     Player();
+    //destructor
+    ~Player();
+    //copy constructor
+    Player(const Player& pl);
     int getArmies();
     int getPlayerId();
+    //the vector of territory pointers to defend
     vector<Territory*> toDefend();
+    //the vector of territory pointers to attack
     vector<Territory*> toAttack();
-    void issueOrder();
-    // i don't think you need this method
-    void getAdjacentTerritories();
+    ////the vector of oder pointers to issueOrder
+    vector<Order*> issueOrder();
+
+   
     void declareOwner(string countryName);
 
     // need to implement a setter method

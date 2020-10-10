@@ -4,6 +4,8 @@
 #include <string>
 
 #include "player.h"
+#include "Cards.h"
+#include "Orders.h"
 #include "../Map/Map.h"
 
 
@@ -68,6 +70,12 @@ vector<Territory*> Player::toAttack(){
     // return a list of unique adjacent territories to the players territory
     return toAttack;
 }
+//creates an order object and adds it to the list of orders
+vector<Order*> Player::issueOrder(){
+    Order *o = new Order();
+    //OrdersList.push_back(o);
+}
+
 
 void Player::declareOwner(string countryName) {
     // let the map know whtat the player now owns the territory identified by countryName
