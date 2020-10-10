@@ -5,7 +5,7 @@
 
 #include "player.h"
 #include "Cards.h"
-#include "Orders.h"
+#include "../Order/Orders.h"
 #include "../Map/Map.h"
 
 
@@ -19,6 +19,7 @@ Player::Player(){
     this->armies = 0;
     this->playerId = new int(245);
     this->ownedTerritories = new vector<Territory*>;   
+    OrdersList* ol = new OrdersList();
 }
 int Player::getArmies(){
    this->armies;
@@ -72,8 +73,8 @@ vector<Territory*> Player::toAttack(){
 }
 //creates an order object and adds it to the list of orders
 vector<Order*> Player::issueOrder(){
-    Order *o = new Order();
-    //OrdersList.push_back(o);
+    Order o = Order();
+    this->ol->addOrder(o);
 }
 
 
