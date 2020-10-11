@@ -45,5 +45,7 @@ int main() {
 	// all player objects can now call member functions 
 	Player* aPlayer = new Player();
 	aPlayer->declareOwner("Canada");
-	
+	aPlayer->issueOrder();
+	aPlayer->toDefend();
+	aPlayer->toAttack();
 }
