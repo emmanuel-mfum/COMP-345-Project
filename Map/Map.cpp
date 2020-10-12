@@ -296,7 +296,7 @@ string Map::getDisplayString() {
 
 Territory::Territory(const TerritoryType &territoryType, string territoryName) {
 	this->connections = new vector<MapEdge*>;
-	this->territoryType = &(TerritoryType(territoryType));
+	this->territoryType = new TerritoryType(territoryType);
 	this->territoryName = new string(territoryName);
 	this->parent = nullptr;
 	this->ownerId = nullptr;
@@ -313,7 +313,7 @@ Territory::Territory(const TerritoryType &territoryType, string territoryName) {
 
 Territory::Territory(const Territory& source) {
 	// the copy constructor
-	this->territoryType = &(TerritoryType(*source.territoryType));
+	this->territoryType = new TerritoryType(*source.territoryType);
 	this->territoryName = new string(*source.territoryName);
 	this->parent = source.parent;
 	if (source.ownerId == nullptr) {
@@ -389,7 +389,7 @@ Territory& Territory::operator=(const Territory& rhs) {
 	delete this->vertices;
 	delete this->connections;
 	// how to avoid copying this code across constructors. . . . ?!
-	this->territoryType = &(TerritoryType(*rhs.territoryType));
+	this->territoryType = new TerritoryType(*rhs.territoryType);
 	this->territoryName = new string(*rhs.territoryName);
 	this->parent = rhs.parent;
 	if (rhs.ownerId == nullptr) {
