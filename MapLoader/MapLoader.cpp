@@ -20,11 +20,8 @@ Map MapLoader::load_map(std::string fName) {
 	while (std::getline(input_stream, line_read) && line_read != "[continents]") {}
 	while (std::getline(input_stream, line_read) && line_read != "") {
 		//set all continents
-		//check if it's digit - if it is 
-		//check the color
-		// are the colour and digit important???
 		// for each continent create it like
-		// map->addContinentByName(newContinentName);
+		 map->addContinentByName(newContinentName);
 
 	}
 
@@ -36,7 +33,7 @@ Map MapLoader::load_map(std::string fName) {
 		// then add the country to the map like
 		// map->addContinentByName(continentName, newCountryName);
 		// add all the edges like
-		// map->addEdgeByName(territoryName, territoryName);
+		map->addEdgeByName(territoryName, territoryName);
 	}
 
 	// The input stream is restarted from the beginning.
