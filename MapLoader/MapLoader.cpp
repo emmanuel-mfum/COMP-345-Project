@@ -49,8 +49,11 @@ Map MapLoader::load_map(string fName) {
 	input_stream.seekg(0, input_stream.beg);
 
 
-	//Set territories
-
+       //Set the borders
+	while (std::getline(ifs, line) && line != "[border]") {}
+	while (std::getline(ifs, line)) {
+	//set borders here
+		}
 	return map;
 
 }
