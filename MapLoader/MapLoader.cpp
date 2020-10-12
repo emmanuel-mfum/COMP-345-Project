@@ -33,8 +33,8 @@ Map MapLoader::load_map(string fName) {
 	while (getline(input_stream, line_read) && line_read != "[continents]") {}
 	while (getline(input_stream, line_read) && line_read != "") {
 		//set all continents
-
-		 const std::string newContinentName = line.substr(0, equalsIndex);
+         
+		 const std::string newContinentName = line.substr();
 		 map->addContinentByName(newContinentName);
 
 	}
