@@ -14,7 +14,7 @@ MapLoader::MapLoader() {
 }
 //parameterized constructor
 MapLoader::MapLoader(string fName) {
-	newMap = load_map(textFileName);
+	newMap = load_map(fName);
 }
 
 //destructor
