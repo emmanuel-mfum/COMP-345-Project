@@ -3,5 +3,7 @@
 class Map;
 
 class MapLoader {
-	public static Map load_map(std::string fName);
+// need to add colon after public
+public:
+	static Map load_map(std::string fName);
 };
