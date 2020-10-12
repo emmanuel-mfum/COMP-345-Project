@@ -1,5 +1,4 @@
-#ifndef Orders_h
-#define Orders_h
+#pragma once
 
 #include <iostream>
 #include <list>
@@ -83,6 +82,3 @@ public:
 private:
     std::list<std::unique_ptr<Order>> orders_;
 };
-
-#endif
-
