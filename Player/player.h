@@ -26,6 +26,7 @@ public:
     ~Player();
     //copy constructor
     Player(const Player& pl);
+    friend std::ostream& operator<<(std::ostream& out, const Player& toOut);
     int getArmies();
     int getPlayerId();
     //the vector of territory pointers to defend
