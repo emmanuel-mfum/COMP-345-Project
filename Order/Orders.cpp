@@ -1,4 +1,5 @@
 #include "Orders.h"
+#include "Orders.h"
 
 OrdersList::OrdersList(){}
 
@@ -7,6 +8,8 @@ Order::Order(){}
 Order::Order(const std::string& type) : type_(type) {
     std::cout <<"A \"" << type_ << "\" order has been created!" << std::endl;
 }
+
+Order::~Order(){}
 
 Order::Order(const Order& other) : type_(other.type_) { }
 
@@ -33,11 +36,15 @@ std::ostream& operator<<(std::ostream& os, const Order& order) {
 //Class Constructor
 Deploy::Deploy(){}
 
+Deploy::~Deploy(){}
+
 Deploy::Deploy(const std::string& type) : Order(type) { }
 
 Deploy::Deploy(const Deploy& other) : Order(other.type_) { }
 
 Advance::Advance(){}
+
+Advance::~Advance(){}
 
 Advance::Advance(const std::string& type) : Order(type) { }
 
@@ -45,11 +52,15 @@ Advance::Advance(const Advance& other) : Order(other.type_) { }
 
 Bomb::Bomb(){}
 
+Bomb::~Bomb(){}
+
 Bomb::Bomb(const std::string& type) : Order(type) { }
 
 Bomb::Bomb(const Bomb& other) : Order(other.type_) { }
 
 Blockade::Blockade(){}
+
+Blockade::~Blockade(){}
 
 Blockade::Blockade(const std::string& type) : Order(type) { }
 
@@ -57,15 +68,21 @@ Blockade::Blockade(const Blockade& other) : Order(other.type_) { }
 
 Airlift::Airlift(){}
 
+Airlift::~Airlift(){}
+
 Airlift::Airlift(const std::string& type) : Order(type) { }
 
 Airlift::Airlift(const Airlift& other) : Order(other.type_) { }
 
 Negotiate::Negotiate(){ }
 
+Negotiate::~Negotiate(){}
+
 Negotiate::Negotiate(const std::string& type) : Order(type) { }
 
 Negotiate::Negotiate(const Negotiate& other) : Order(other.type_) {}
+
+OrdersList::~OrdersList(){}
 
 //Add method to add Orders to the list
 void OrdersList::addOrder(const Order& order) {
