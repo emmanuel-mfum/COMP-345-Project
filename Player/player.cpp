@@ -4,7 +4,6 @@
 #include <string>
 
 #include "player.h"
-#include "../Card/Cards.h"
 #include "../Order/Orders.h"
 #include "../Map/Map.h"
 
@@ -22,11 +21,11 @@ Player::Player(){
     OrdersList* ol = new OrdersList();
 }
 int Player::getArmies(){
-   return this->armies;
+   return *this->armies;
 }
 
 int Player::getPlayerId(){
-    return this->playerId;
+    return *this->playerId;
 }
 
 
