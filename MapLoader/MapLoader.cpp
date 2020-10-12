@@ -8,41 +8,56 @@
 
 using namespace std;
 
-Map MapLoader::load_map(std::string fName) {
+//default constructor
+MapLoader::MapLoader() {
+	newMap = new Map();
+}
+//parameterized constructor
+MapLoader::MapLoader(string fName) {
+	newMap = load_map(textFileName);
+}
+
+//destructor
+MapLoader::~MapLoader() {
+	delete newMap;
+}
+
+
+Map MapLoader::load_map(string fName) {
 	Map* map = nullptr;
 
 	std::ifstream input_stream(fName);
 	std::string line_read;
-	// get the name from the top of the file
-	// instantiate the map object with a name
 
 	// Load the continents.
-	while (std::getline(input_stream, line_read) && line_read != "[continents]") {}
-	while (std::getline(input_stream, line_read) && line_read != "") {
+	while (getline(input_stream, line_read) && line_read != "[continents]") {}
+	while (getline(input_stream, line_read) && line_read != "") {
 		//set all continents
-		// for each continent create it like
+
+		 const std::string newContinentName = line.substr(0, equalsIndex);
 		 map->addContinentByName(newContinentName);
 
 	}
 
 	// Load the countries
-	while (std::getline(input_stream, line_read) && line_read != "[countries]") {}
-	while (std::getline(input_stream, line_read)) {
+	while (getline(input_stream, line_read) && line_read != "[countries]") {}
+	while (getline(input_stream, line_read)) {
 		//set all countries
-		// Territory* newCountry = new Territory(TerritoryType::Country, "newCountryName");
-		// then add the country to the map like
-		// map->addContinentByName(continentName, newCountryName);
-		// add all the edges like
+
+		Territory* newCountry = new Territory(TerritoryType::Country, "newCountryName");
+		map->addContinentByName(continentName, newCountryName);
 		map->addEdgeByName(territoryName, territoryName);
 	}
+
 
 	// The input stream is restarted from the beginning.
 	input_stream.clear();
 	input_stream.seekg(0, input_stream.beg);
 
 
-
-
 	//Set the borders
 
+	return map;
+
 }
+
