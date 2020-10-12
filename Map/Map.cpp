@@ -42,11 +42,13 @@ Map::Map(const Map& source) {
 Map::~Map() {
 	// Map should delete all the objects as well ??
 	delete this->edges;
+	this->edges = NULL;
 	delete this->vertices;
+	this->vertices = NULL;
 	delete this->mapTerritories;
+	this->mapTerritories = NULL;
 	delete this->mapName;
-
-
+	this->mapName = NULL;
 };
 
 
@@ -273,15 +275,6 @@ Territory* Map::setPlayerOwnership(int playerId, string territoryName) {
 	return nullptr;
 }
 
-string const& Map::getDisplayStringForOut() const {
-	string displayString = "\n===================================\n";
-	displayString.append("MAP: " + *this->mapName);
-	displayString.append("\n  Continents: " + to_string(this->vertices->size()));
-	displayString.append("\n  Countries: " + to_string((this->mapTerritories->size() - this->vertices->size())));
-	displayString.append("\n===================================\n\n");
-	return displayString;
-}
-
 string Map::getDisplayString() {
 	string displayString = "\n===================================\n";
 	displayString.append("MAP: " + *this->mapName);
@@ -352,11 +345,17 @@ Territory::Territory(const Territory& source) {
 
 Territory::~Territory() {
 	delete this->territoryName;
+	this->territoryName = NULL;
 	delete this->territoryType;
+	this->territoryType = NULL;
 	delete this->vertices;
+	this->vertices = NULL;
 	delete this->connections;
+	this->connections = NULL;
 	delete this->parent;
+	this->parent = NULL;
 	delete this->ownerId;
+	this->ownerId = NULL;
 }
 
 
@@ -494,6 +493,8 @@ MapEdge::MapEdge(Territory* territoryOne, Territory* territoryTwo) {
 MapEdge::~MapEdge() {
 	delete this->territoryOne;
 	delete this->territoryTwo;
+	this->territoryOne = NULL;
+	this->territoryTwo = NULL;
 }
 
 MapEdge::MapEdge(const MapEdge& source) {
