@@ -12,7 +12,7 @@ MapLoader::MapLoader() {
 }
 //parameterized constructor
 MapLoader::MapLoader(string fName) {
-	newMap = load_map(fName);
+	Map* newMap = load_map(fName);
 }
 
 //destructor
@@ -22,7 +22,6 @@ MapLoader::~MapLoader() {
 
 
 Map MapLoader::load_map(string fName) {
-	Map* map = nullptr;
 
 	std::ifstream input_stream(fName);
 	std::string line_read;
