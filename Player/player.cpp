@@ -4,7 +4,7 @@
 #include <string>
 
 #include "player.h"
-#include "Cards.h"
+#include "../Card/Cards.h"
 #include "../Order/Orders.h"
 #include "../Map/Map.h"
 
@@ -22,11 +22,11 @@ Player::Player(){
     OrdersList* ol = new OrdersList();
 }
 int Player::getArmies(){
-   this->armies;
+   return this->armies;
 }
 
 int Player::getPlayerId(){
-    this->playerId;
+    return this->playerId;
 }
 
 
@@ -36,12 +36,6 @@ vector<Territory*> Player::toDefend(){
 
    return *this->ownedTerritories;
 }
-/*
-* this method can just return the list of territories adjacent to the territories the player owns!
-* i don't think you should pass the player as an argument, it is a member function of the player class 
-* this method just needs to loop through the list of territories the player owns, and call getAdjacentTerritories on that territory!
-* build a list of those adjacent territories and return them!
-*/
 
 vector<Territory*> Player::toAttack(){
     // build a list of territories
@@ -72,7 +66,7 @@ vector<Territory*> Player::toAttack(){
     return toAttack;
 }
 //creates an order object and adds it to the list of orders
-vector<Order*> Player::issueOrder(){
+void Player::issueOrder(){
     Order o = Order();
     this->ol->addOrder(o);
 }

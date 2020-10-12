@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include "../Map/Map.h"
+#include "../Order/Orders.h"
 
 using namespace std;
 
@@ -34,7 +35,7 @@ public:
     //the vector of territory pointers to attack
     vector<Territory*> toAttack();
     ////the vector of oder pointers to issueOrder
-    vector<Order*> issueOrder();
+    void issueOrder();
     OrdersList *ol;
    
     void declareOwner(string countryName);
