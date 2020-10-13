@@ -1,7 +1,6 @@
 #include <string>
 #include <iostream>
 #include "../Map/Map.h"
-#include "../Player/player.h"
 
 using namespace std;
 
@@ -85,10 +84,4 @@ int main() {
 	cout << *kenya;
 	cout << *e;
 
-	Player::setMap(m);
-
-	Player* aPlayer = new Player();
-	aPlayer->declareOwner("France");
-
-	std::cout << "END!" << endl;
 }
