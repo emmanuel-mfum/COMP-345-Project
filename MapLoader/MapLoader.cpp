@@ -27,10 +27,9 @@ MapLoader::~MapLoader() {
 
 Map* MapLoader::load_map(string fName) {
 	Map* map = nullptr;
-
+	
 	std::ifstream input_stream(fName);
 	std::string line_read;
-
 
 	bool isContinents = false;
 	bool isCountries = false;

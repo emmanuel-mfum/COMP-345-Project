@@ -5,7 +5,7 @@ using namespace std;
 
 int main() {
     try {
-        MapLoader loader("./MapLoader/maps/TestMap.txt");
+        MapLoader loader("./MapLoader/TestMap.txt");
         cout << "Map was successfully loaded." << endl;
     }
     catch (invalid_argument ex) {
