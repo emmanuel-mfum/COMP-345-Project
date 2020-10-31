@@ -56,20 +56,25 @@ Map* MapLoader::load_map(string fName) {
 		}
 		else if (line.compare("[continents]") == 0) {
 			// have to start reading continents
+			cout << "READING CONTINENTS\n" << endl;
 			isContinents = true;
 			readSplitToken = true;
 		}
 		else if (line.compare("[countries]") == 0) {
 			// connect all the continents once we have finished reading them all
+			cout << "\n\nCONNECTING CONTINENTS\n" << endl;
 			for (int i = 0; i < continents->size() - 1; i++) {
+				cout << "Connected: " << continents->at(i) << " --> " << continents->at(i + 1) << endl;
 				map->addEdgeByName(continents->at(i), continents->at(i + 1));
 			}
+			cout << "\n\nREADING CONTINENTS\n" << endl;
 			// have to start reading countries
 			isContinents = false;
 			isCountries = true;
 			readSplitToken = true;
 		}
 		else if (line.compare("[borders]") == 0) {
+			cout << "\n\nCONNECTING COUNTRIES\n" << endl;
 			// have to start reading the borders
 			isCountries = false;
 			isBorders = true;
@@ -81,8 +86,8 @@ Map* MapLoader::load_map(string fName) {
 			if (isContinents) {
 				// add the continent to the map
 				string continentName = line.substr(0, line.find(" "));
-				cout << "Created territory: " + continentName << endl;
 				map->addContinentByName(continentName);
+				cout << "Created territory: " + continentName << endl;
 				continents->push_back(continentName);
 			}
 			else if (isCountries) {
@@ -102,6 +107,7 @@ Map* MapLoader::load_map(string fName) {
 					else if (countryCounter == 2) {
 						string continentName = continents->at(stoi(token) - 1);
 						map->addCountryByName(continentName, countryName);
+						cout << "Created territory: " + countryName << endl;
 						countries->push_back(countryName);
 					}
 
@@ -125,6 +131,7 @@ Map* MapLoader::load_map(string fName) {
 
 					else {
 						// add an edge
+						cout << "Connected: " << countryName << " --> " << countries->at(stoi(token) - 1) << endl;
 						map->addEdgeByName(countryName, countries->at(stoi(token) - 1));
 					}
 
@@ -139,6 +146,7 @@ Map* MapLoader::load_map(string fName) {
 	input_stream.clear();
 	input_stream.seekg(0, input_stream.beg);
 
+	bool isValid = map->validate();
 	return map;
 }
 

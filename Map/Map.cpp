@@ -216,6 +216,13 @@ Map::Map(string mapName) {
 	this->mapTerritories;
 }
 
+
+Map::~Map() {
+
+}
+
+
+
 bool Map::territoryExists(string territoryName) {
 	// check if the map contains a territory with this name already
 	// Map relies on territoryName being unique!
@@ -298,14 +305,14 @@ void Map::addEdgeByName(string territoryNameOne, string territoryNameTwo) {
 		MapComponent* terrOne = this->mapTerritories.at(this->findTerritory(territoryNameOne));
 		MapComponent* terrTwo = this->mapTerritories.at(this->findTerritory(territoryNameTwo));;
 
-		if (
-			terrOne->getTerritoryType() == terrTwo->getTerritoryType() &&
-			!this->edgeExists(terrOne, terrTwo)
-		) {
-			this->addEdgeByReference(terrOne, terrTwo);
+		if (terrOne->getTerritoryType() != terrTwo->getTerritoryType()) {
+			cout << "The territories can't be connected because they are not of the same type!!" << endl;
+		}
+		else if (this->edgeExists(terrOne, terrTwo)) {
+			cout << "The territories were not connected because a connection already exists!!" << endl;
 		}
 		else {
-			cout << "The territories can't be connected because they are not of the same type!!" << endl;
+			this->addEdgeByReference(terrOne, terrTwo);
 		}
 	}
 	else {
