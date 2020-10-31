@@ -7,102 +7,162 @@
 using namespace std;
 /**
 *
-* This file contains Map, Territory, Country, Continent, and MapEdge classes
+* This file contains Map, MapComponent, Country, Continent, and MapEdge classes
 *
 */
-
-// let the compiler know these classes are defined in this file
-class MapEdge;
-class Territory;
 class Map;
+class MapComponent;
+class MapEdge;
+class Continent;
+class Country;
+
 
 
 enum class TerritoryType {
 	Country = 1,
 	Continent = 2,
+	Undefined = 3
 };
 
 
-
-
-
+/* ========================================================================================================= */
 /*
-*
-* MapEdge represents connection between two MapVertices
+* 
+* 
+* MAP EDGE
+* 
+* 
 */
 class MapEdge {
 public:
-	MapEdge(Territory* territoryOne, Territory* territoryTwo);
+	MapEdge(MapComponent* territoryOne, MapComponent* territoryTwo);
 	MapEdge(const MapEdge& source);
-	
+
 	~MapEdge();
 
 	MapEdge& operator=(const MapEdge& rhs);
 
 	friend std::ostream& operator<<(std::ostream& out, const MapEdge& toOut);
 
-	Territory* getAdjacentTerritory(string territoryName);
-
+	MapComponent* getAdjacentTerritory(string territoryName);
+	bool containsBothTerritories(MapComponent* territoryOne, MapComponent* territoryTwo);
 
 private:
-	Territory* territoryOne;
-	Territory* territoryTwo;
+	MapComponent* territoryOne;
+	MapComponent* territoryTwo;
 };
 
 
+/* ========================================================================================================= */
 /*
-*
-* Territory is the class that represents a vertex in the graph
+* 
+* 
+* MAP COMPONENT
+* 
+* 
 */
-class Territory {
+class MapComponent {
 public:
-	Territory(const TerritoryType& territoryType, string territoryName);
-	Territory(const Territory& source);
+	MapComponent(string territoryName);
+	MapComponent(string territoryName, TerritoryType t);
+	MapComponent(const MapComponent& source);
 
-	~Territory();
+	~MapComponent();
 
-	Territory& operator=(const Territory& rhs);
+	MapComponent& operator=(const MapComponent& rhs);
 
-	friend ostream& operator<<(ostream& out, const Territory& toOut);
+	friend ostream& operator<<(ostream& out, const MapComponent& toOut);
 
 	bool territoryNameMatches(string territoryName);
-	void addVertex(Territory* territory);
-	void addEdge(MapEdge* mapEdge);
-	bool isContinent();
+	void addEdge(MapEdge* edge);
 	bool validate(int min);
-	void setParent(Territory* parent);
-	void setPlayerOwnership(int playerId);
 	string getTerritoryName();
+	vector<MapComponent*> getAdjacentTerritories();
 	TerritoryType getTerritoryType();
-	string getContinentName();
-	vector<Territory*>* getAdjacentTerritories();
+	
 
 private:
-	// defines type
-	TerritoryType* territoryType;
-	// vertices is subgraph. . . . will only apply if territory is a continent, or if country definition is expanded to contain regions
-	vector<Territory*>* vertices;
-	// connections is other nodes this node is connected to
-	vector<MapEdge*>* connections;
+	static int getAndUpdateIdForNew();
+	static int componentCounter;
+	virtual void doNothing() {}
 
-	/*
-	* Territory's individual characteristics
-	*/
-	string* territoryName;
-	// parent is applicable when territory is country, parent will be continent containing the country
-	Territory* parent;
-	// playerId is used to indicate ownership of territory by a player, applicable to countries
-	int* ownerId;
+protected:
+	TerritoryType territoryType;
+	int territoryId;
+	string territoryName;
+	vector<MapEdge*> connections;
 };
 
 
 
-
-
-
-/**
+/* ========================================================================================================= */
+/*
 *
-* Map class is the object that holds information about continents
+*
+* CONTINENT
+*
+*
+*/
+class Continent : public MapComponent {
+public:
+	Continent(string territoryName);
+	Continent(const Continent& source);
+	
+	~Continent();
+
+	Continent& operator=(const Continent& rhs);
+
+	friend ostream& operator<<(ostream& out, const Continent& toOut);
+
+	void addVertex(Country* country);
+
+
+private:
+	vector<Country*> vertices;
+	virtual void doNothing() {}
+};
+
+
+
+/* ========================================================================================================= */
+/*
+*
+*
+* COUNTRY
+*
+*
+*/
+class Country : public MapComponent {
+public:
+	Country(string territoryName);
+	Country(const Country& source);
+
+	~Country();
+
+	Country& operator=(const Country& rhs);
+
+	friend ostream& operator<<(ostream& out, const Country& toOut);
+
+	void setParent(Continent* parent);
+	void setPlayerOwnership(int playerId);
+	string getContinentParentName();
+
+
+private:
+	Continent* parent;
+	int playerId;
+	virtual void doNothing() {}
+};
+
+
+
+/* ========================================================================================================= */
+/*
+*
+*
+* MAP
+*
+*
 */
 class Map {
 public:
@@ -116,26 +176,22 @@ public:
 	friend std::ostream& operator<<(std::ostream& out, const Map& toOut);
 
 	bool territoryExists(string territoryName);
-	void addTerritoryByName(const TerritoryType& territoryType, string territoryName);
-	void addTerritoryByReference(Territory* territory);
 	void addCountryByName(string continentName, string territoryName);
-	void addCountryByReference(Territory* continent, Territory* country);
+	void addCountryByReference(Continent* continent, Country* country);
 	void addEdgeByName(string territoryNameOne, string territoryNameTwo);
-	void addEdgeByReference(Territory* territoryOne, Territory* territoryTwo);
+	void addEdgeByReference(MapComponent* territoryOne, MapComponent* territoryTwo);
 	void addContinentByName(string continentName);
-	void addContinentByReference(Territory* continent);
-	void addVertex(Territory* territory);
+	void addContinentByReference(Continent* continent);
+	bool edgeExists(MapComponent* territoryOne, MapComponent* territoryTwo);
 	bool validate();
-	Territory* setPlayerOwnership(int playerId, string territoryName);
-
-	string const& getDisplayStringForOut() const;
+	Country* setPlayerOwnership(int playerId, string territoryName);
 	string getDisplayString();
 
 private:
-	string* mapName;
-	vector<Territory*>* vertices;
-	vector<MapEdge*>* edges;
-	vector<Territory*>* mapTerritories;
+	string mapName;
+	vector<Continent*> vertices;
+	vector<MapEdge*> edges;
+	vector<MapComponent*> mapTerritories;
 
 	int findTerritory(string territoryName);
 };

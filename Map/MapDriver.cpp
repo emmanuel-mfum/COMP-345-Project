@@ -1,25 +1,26 @@
 #include <string>
+#include <vector>
 #include <iostream>
-#include "../Map/Map.h"
+
+#include "Map.h"
+
 
 using namespace std;
 
 
 int main() {
-	std::cout << "HELLO" << endl;
-
 
 	Map* m = new Map("Risk Map");
 
-	Territory* france = new Territory(TerritoryType::Country, "France");
-	Territory* europe = new Territory(TerritoryType::Continent, "Europe");
-	Territory* uk = new Territory(TerritoryType::Country, "United Kingdom");
-	Territory* canada = new Territory(TerritoryType::Country, "Canada");
-	Territory* northAmerica = new Territory(TerritoryType::Continent, "North America");
-	Territory* kenya = new Territory(TerritoryType::Country, "Kenya");
-	Territory* ethiopia = new Territory(TerritoryType::Country, "Ethiopia");
-	Territory* africa = new Territory(TerritoryType::Continent, "Africa");
-	Territory* germany = new Territory(TerritoryType::Country, "Germany");
+	Country* france = new Country("France");
+	Continent* europe = new Continent("Europe");
+	Country* uk = new Country("United Kingdom");
+	Country* canada = new Country("Canada");
+	Continent* northAmerica = new Continent("North America");
+	Country* kenya = new Country("Kenya");
+	Country* ethiopia = new Country("Ethiopia");
+	Continent* africa = new Continent("Africa");
+	Country* germany = new Country("Germany");
 
 
 	// add continents, and countries
@@ -68,20 +69,16 @@ int main() {
 
 	m->addEdgeByReference(germany, france);
 
-	Territory* e = m->setPlayerOwnership(25, "Ethiopia");
+	Country* e = m->setPlayerOwnership(25, "Ethiopia");
 
-	Territory* g = m->setPlayerOwnership(41, "Germany");
+	Country* g = m->setPlayerOwnership(41, "Germany");
 
 	// true!!!!
 	isValidMap = m->validate();
 
-	std::cout << *m;
+	cout << "END" << endl;
 
-	cout << *africa;
-	cout << *northAmerica;
-	cout << *europe;
-	cout << *canada;
-	cout << *kenya;
-	cout << *e;
 
+
+	return 0;
 }
