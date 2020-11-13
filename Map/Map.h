@@ -78,6 +78,7 @@ public:
 	bool validate(int min);
 	string getTerritoryName();
 	vector<MapComponent*> getAdjacentTerritories();
+	vector<Country*> getAdjacentCountries();
 	TerritoryType getTerritoryType();
 	
 

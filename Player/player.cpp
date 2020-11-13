@@ -14,36 +14,44 @@ using namespace std;
 // initialize the static member worldMap to null
 Map* Player::worldMap = nullptr;
 
+int Player::playerCounter = 0;
+
 Player::Player(){
     this->armies = 0;
-    this->playerId = new int(245);
-    this->ownedTerritories = new vector<Territory*>;   
+    this->playerId = Player::getAndUpdateIdForNew();
+    this->ownedTerritories;   
     OrdersList* ol = new OrdersList();
 }
 int Player::getArmies(){
-   return *this->armies;
+   return this->armies;
 }
 
 int Player::getPlayerId(){
-    return *this->playerId;
+    return this->playerId;
+}
+
+int Player::getAndUpdateIdForNew() {
+    int newInt = Player::playerCounter;
+    Player::playerCounter++;
+    return newInt;
 }
 
 
 // this method can just return the list of territories the player owns!
-vector<Territory*> Player::toDefend(){
+vector<Country*> Player::toDefend(){
    cout<<"The list of territories owned by the player "<<playerId<<":"<<endl;
 
-   return *this->ownedTerritories;
+   return this->ownedTerritories;
 }
 
-vector<Territory*> Player::toAttack(){
+vector<Country*> Player::toAttack(){
     // build a list of territories
-    vector<Territory*> toAttack = vector<Territory*>();
+    vector<Country*> toAttack = vector<Country*>();
 
     // loop through each owned territory
-    for (int i = 0; i < this->ownedTerritories->size(); i++){
+    for (int i = 0; i < this->ownedTerritories.size(); i++){
         // get the adjacent territories to the current owned territory
-        vector<Territory*> adjacentTerrs = *this->ownedTerritories->at(i)->getAdjacentTerritories();
+        vector<Country*> adjacentTerrs = (dynamic_cast<MapComponent*>(this->ownedTerritories.at(i)))->getAdjacentCountries();
         // loop through each adjacent territories
         for (int j = 0; j < adjacentTerrs.size(); j++) {
             bool found = false;
@@ -75,10 +83,10 @@ void Player::declareOwner(string countryName) {
     // let the map know whtat the player now owns the territory identified by countryName
     Map* m = worldMap;
 
-    Territory* ownedTerritory = worldMap->setPlayerOwnership(*this->playerId, countryName);
+    Country* ownedTerritory = worldMap->setPlayerOwnership(this->playerId, countryName);
 
     // HERE: just need to add ownedTerritory to this players list of owned territories
-
+    this->ownedTerritories.push_back(ownedTerritory);
 }
 
 

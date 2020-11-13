@@ -148,6 +148,21 @@ vector<MapComponent*> MapComponent::getAdjacentTerritories() {
 	return adjacentTerritories;
 }
 
+vector<Country*> MapComponent::getAdjacentCountries() {
+	vector<Country*> adjacentTerritories;
+	if (this->territoryType != TerritoryType::Country) {
+		return adjacentTerritories;
+	}
+	// loop through all the connections this Country has
+	for (int i = 0; i < this->connections.size(); i++) {
+		MapEdge* edge = this->connections.at(i);
+		// get the other Country participating in the connection that is not this MapComponent
+		MapComponent* adjacentTerr = edge->getAdjacentTerritory(this->territoryName);
+		adjacentTerritories.push_back(dynamic_cast<Country*>(adjacentTerr));
+	}
+	return adjacentTerritories;
+}
+
 TerritoryType MapComponent::getTerritoryType() {
 	return this->territoryType;
 }
