@@ -64,4 +64,19 @@ void GameEngine::gameStart() {
      }
 }
 
-
+void GameEngine::startupPhase(){
+    //still in progres.....
+    int numberOfArmies;
+		if (numberOfPlayers() == 2) {
+			numberOfArmies = 40;
+		}
+		else if (numberOfPlayers() == 3) {
+			numberOfArmies = 35;
+		}
+		else if (numberOfPlayers() == 4) {
+			numberOfArmies = 30;
+		}	
+		else if (numberOfPlayers() == 5) {
+			numberOfArmies = 25;
+	
+}
