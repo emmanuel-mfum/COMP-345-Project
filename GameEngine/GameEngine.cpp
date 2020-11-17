@@ -30,15 +30,15 @@ bool GameEngine::ObserverOption() {
 
 //default constructor
 GameEngine::GameEngine() {
-    Player = new Player();
+    player = new Player();
     playerList = list<Player>();
-    map = new Map(); 
+    //map = new Map(); default constructor needed
     deck = new Deck();
 }
 
 //copy constructor
 GameEngine::GameEngine(const GameEngine& gameEngine) {
-    Player = gameEngine.Player;
+    player = gameEngine.player;
     playerList = gameEngine.playerList;
     map = gameEngine.map;
     deck = gameEngine.deck;
@@ -46,7 +46,7 @@ GameEngine::GameEngine(const GameEngine& gameEngine) {
 
 //destructor
 GameEngine::~GameEngine() {
-    delete this->Player;
+    delete this->player;
     delete this->map;
     delete this->deck;
 }
@@ -66,4 +66,5 @@ void GameEngine::gameStart() {
          this->playerList.emplace_back(PlayerName);
      }
 }
+
 
