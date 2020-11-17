@@ -32,6 +32,11 @@ public:
 	static string mapSelection();
 	static int playerSelection();
 	bool ObserverFunction();
+	
+	/*
+	part 2
+	void startupPhase();
+	*/
 
 
 	
