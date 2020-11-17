@@ -1,13 +1,17 @@
+
 #include "GameEngine.h"
 #include "MapLoader.h"
 #include "Player.h"
 #include "Cards.h"
 
-#include <iostream>
+
 
 using namespace std;
 
 const char* GameEngine::directory = "../Map_Directory/";
+
+
+
 
 string GameEngine::mapSelection() {
     //in progress
@@ -18,9 +22,11 @@ int GameEngine::numberOfPlayers() {
     //in progress
 }
 
-bool GameEngine::ObserverFunction() {
+bool GameEngine::ObserverOption() {
     //in progress
 }
+
+
 
 //default constructor
 GameEngine::GameEngine() {
@@ -45,15 +51,19 @@ GameEngine::~GameEngine() {
     delete this->deck;
 }
 
-//part 2 here startUpphase(){}
 
 
 void GameEngine::gameStart() {
     // choose map
      string map= mapSelection();
     // Select number of players 2-5
-     int numberOfPlayers=numberOfPlayers();
+     int numPlayers=numberOfPlayers();
     // Turn on/off observers here
-     bool observerFunction = ObserverFunction();
+     bool observerFunction = ObserverOption();
+
+     for (int i = 1; i <= numPlayers; i++) {
+         string PlayerName = "Player Number " + to_string(i);
+         this->playerList.emplace_back(PlayerName);
+     }
 }
 
