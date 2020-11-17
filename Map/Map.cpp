@@ -423,6 +423,10 @@ bool Map::validate() {
 	return true;
 }
 
+vector<Country*>Map::getCountries() {
+	return countries;
+}
+
 Country* Map::setPlayerOwnership(int playerId, string territoryName) {
 	if (this->territoryExists(territoryName)) {
 		Country* terr = dynamic_cast<Country*>(this->mapTerritories.at(this->findTerritory(territoryName)));
