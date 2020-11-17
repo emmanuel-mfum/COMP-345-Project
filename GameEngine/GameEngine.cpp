@@ -10,7 +10,28 @@ using namespace std;
 
 const char* GameEngine::directory = "../Map_Directory/";
 
-string mapSelection() {
+int GameEngine::numberOfPlayers() {
+    cout << "============= Number Of Players =============" << endl;
+    int numOfPlayer;
+    bool flag = true;
+    while (flag) {
+        flag = false;
+        cin.clear();
+        flag&& cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout << "Enter the amount of players (2-5):";
+        cin >> numOfPlayer;
+
+        if (numOfPlayer < 2 || numOfPlayer > 5) {
+            cout << "Wrong amount try again" << endl;
+        }
+        flag = !cin.good() || numOfPlayer < 2 || numOfPlayer > 5;
+    }
+    cout << "\nYou have selected " << numOfPlayer << endl;
+    return numOfPlayer;
+}
+
+
+string GameEngine::mapSelection() {
     vector<string> mapDirectory;
     int mapNumber = 0;
     for (const auto& mapFromDirectory : fs::directory_iterator(directory)) {
@@ -34,26 +55,6 @@ string mapSelection() {
     }
     cout << "\nThe map chosen is :" << mapDirectory.at(choice - 1) << endl;
     return mapDirectory.at(choice - 1);
-}
-
-int GameEngine::numberOfPlayers() {
-    cout << "============= Number Of Players =============" << endl;
-    int numOfPlayer;
-    bool flag = true;
-    while (flag) {
-        flag = false;
-        cin.clear();
-        flag&& cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        cout << "Enter the amount of players (2-5):";
-        cin >> numOfPlayer;
-
-        if (numOfPlayer < 2 || numOfPlayer > 5) {
-            cout << "Wrong amount try again" << endl;
-        }
-        flag = !cin.good() || numOfPlayer < 2 || numOfPlayer > 5;
-    }
-    cout << "\nYou have selected " << numOfPlayer << endl;
-    return numOfPlayer;
 }
 
 bool GameEngine::ObserverOption() {
