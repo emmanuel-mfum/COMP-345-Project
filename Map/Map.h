@@ -187,12 +187,12 @@ public:
 	bool validate();
 	Country* setPlayerOwnership(int playerId, string territoryName);
 	string getDisplayString();
-
+	vector<Country*>getCountries();
 private:
 	string mapName;
 	vector<Continent*> vertices;
 	vector<MapEdge*> edges;
 	vector<MapComponent*> mapTerritories;
-
+	vector<Country*>countries;
 	int findTerritory(string territoryName);
 };
