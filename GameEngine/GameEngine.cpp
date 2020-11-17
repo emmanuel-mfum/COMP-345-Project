@@ -58,8 +58,31 @@ string GameEngine::mapSelection() {
 }
 
 bool GameEngine::ObserverOption() {
-    //in progress : this function will ask the user to turn on and off observer option for phase and statistics observer
+    int input;
+    bool flag = true;
+    bool observer = false;
+
+    cout << "\nObserver Setting for " + s + "\n"<< endl;
+
+    while (flag) {
+        flag = false;
+        cin.clear();
+        flag&& cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout << "Enable the observer for " + s + " , type '1' for on and '0' for off: ";
+        cin >> input;
+        flag = !cin.good() || input != 1 && input != 0;
+    }
+    observer = input == 1;
+
+    if (observer == true) {
+        cout <<"\n"+ s + " is set to ON."<< endl;
+    }
+    if (observer == false) {
+        cout <<"\n"+ s + " is set to OFF."<< endl;
+    }
+    return observer;
 }
+
 
 
 
