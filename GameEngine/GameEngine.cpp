@@ -10,10 +10,31 @@ using namespace std;
 
 const char* GameEngine::directory = "../Map_Directory/";
 
-string GameEngine::mapSelection() {
-    //in progress
+string mapSelection() {
+    vector<string> mapDirectory;
+    int mapNumber = 0;
+    for (const auto& mapFromDirectory : fs::directory_iterator(directory)) {
+        mapDirectory.push_back(mapFromDirectory.path().filename().string());
+        cout << "[ Map " << ++mapNumber << "] - Name : " << mapFromDirectory.path().filename();
+        cout << endl;
+    }
+    int choice;
+    bool flag = true;
+    while (flag) {
+        flag = false;
+        cin.clear();
+        flag&& cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout << "Choose a map according to the map number between 1 and " << mapNumber << " :";
+        cin >> choice;
+        if (choice < 1 || choice > mapNumber) {
+            cout << "Invalid choice, try again.";
+            cout << endl;
+        }
+        flag = !cin.good() || choice < 1 || choice > mapNumber;
+    }
+    cout << "\nThe map chosen is :" << mapDirectory.at(choice - 1) << endl;
+    return mapDirectory.at(choice - 1);
 }
-
 
 int GameEngine::numberOfPlayers() {
     cout << "============= Number Of Players =============" << endl;
