@@ -45,6 +45,7 @@ GameEngine::~GameEngine() {
     delete this->deck;
 }
 
+//part 2 here startUpphase(){}
 
 
 void GameEngine::gameStart() {
