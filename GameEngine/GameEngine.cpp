@@ -58,7 +58,7 @@ string GameEngine::mapSelection() {
 }
 
 bool GameEngine::ObserverOption() {
-    //in progress
+    //in progress : this function will ask the user to turn on and off observer option for phase and statistics observer
 }
 
 
