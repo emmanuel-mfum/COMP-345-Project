@@ -30,7 +30,7 @@ public:
 
 	static void gameStart();
 	static string mapSelection();
-	static int playerSelection();
+	static int numberOfPlayers();
 	bool ObserverFunction();
 	
 	/*
