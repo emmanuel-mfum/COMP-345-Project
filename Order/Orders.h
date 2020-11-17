@@ -6,6 +6,9 @@
 #include <iterator>
 #include <memory>
 
+class Country;
+class Player;
+
 class Order {
 friend std::ostream& operator<<(std::ostream& os, const Order& order);
 public:
@@ -14,10 +17,15 @@ public:
     Order(const std::string& type);
     Order(const Order& other);
     const std::string& getType() const;
-    virtual void validate();
-    virtual void execute();
+    virtual bool validate() = 0;
+    virtual void execute() = 0;
+    Player* getPlayer() {};
+    Order* nextImpendingAttack; // not sure about that confusing
+    //Country* getCountry() {};
 protected:
     const std::string type_;
+    Player* player;
+    Country* country;
 };
 
 std::ostream& operator<<(std::ostream& os, const Order& order);
@@ -28,6 +36,8 @@ public:
     ~Deploy();
     Deploy(const std::string& type);
     Deploy(const Deploy& other);
+    void execute();
+    bool validate();
 };
 
 class Advance : public Order {
@@ -36,6 +46,8 @@ public:
     ~Advance();
     Advance(const std::string& type);
     Advance(const Advance& other);
+    void execute();
+    bool validate();
 };
 
 class Bomb : public Order {
@@ -44,6 +56,8 @@ public:
     ~Bomb();
     Bomb(const std::string& type);
     Bomb(const Bomb& other);
+    void execute();
+    bool validate();
 };
 
 class Blockade : public Order {
@@ -52,6 +66,8 @@ public:
     ~Blockade();
     Blockade(const std::string& type);
     Blockade(const Blockade& other);
+    void execute();
+    bool validate();
 };
 
 class Airlift : public Order {
@@ -60,6 +76,8 @@ public:
     ~Airlift();
     Airlift(const std::string& type);
     Airlift(const Airlift& other);
+    void execute();
+    bool validate();
 };
 
 class Negotiate : public Order {
@@ -68,6 +86,8 @@ public:
     ~Negotiate();
     Negotiate(const std::string& type);
     Negotiate(const Negotiate& other);
+    void execute();
+    bool validate();
 };
 
 class OrdersList {
