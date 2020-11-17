@@ -96,3 +96,11 @@ void GameEngine::startupPhase(){
 			numberOfArmies = 25;
 	}
 }
+
+void  GameEngine::issueOrdersPhase(Player* playerList){
+    
+        for (int i = 0; i < playerList.size(); i++)
+        {
+            playerList[i]->issueOrder();
+        }
+};
