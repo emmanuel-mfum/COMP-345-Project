@@ -57,7 +57,7 @@ string GameEngine::mapSelection() {
     return mapDirectory.at(choice - 1);
 }
 
-bool GameEngine::ObserverOption() {
+bool GameEngine::ObserverOption(string s) {
     int input;
     bool flag = true;
     bool observer = false;
@@ -112,12 +112,14 @@ GameEngine::~GameEngine() {
 
 
 void GameEngine::gameStart() {
-    // choose map
+     //Initialize map
      string map= mapSelection();
-    // Select number of players 2-5
+    //Initialize number of players
      int numPlayers=numberOfPlayers();
-    // Turn on/off observers here
-     bool observerFunction = ObserverOption();
+    //Initialize Phase Observer
+     bool observerFunction = ObserverOption("'Phase Observer'");
+    //Initialize Statistics Observer
+    bool observerFunction = ObserverOption("'Statistics Observer'");
 
      for (int i = 1; i <= numPlayers; i++) {
          string PlayerName = "Player Number " + to_string(i);
