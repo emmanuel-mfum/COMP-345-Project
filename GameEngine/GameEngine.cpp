@@ -78,5 +78,5 @@ void GameEngine::startupPhase(){
 		}	
 		else if (numberOfPlayers() == 5) {
 			numberOfArmies = 25;
-	
+	}
 }
