@@ -81,19 +81,35 @@ void GameEngine::gameStart() {
 }
 
 void GameEngine::startupPhase(){
-    //still in progres.....
-    int numberOfArmies;
-		if (numberOfPlayers() == 2) {
-			numberOfArmies = 40;
-		}
-		else if (numberOfPlayers() == 3) {
-			numberOfArmies = 35;
-		}
-		else if (numberOfPlayers() == 4) {
-			numberOfArmies = 30;
-		}	
-		else if (numberOfPlayers() == 5) {
-			numberOfArmies = 25;
+   vector<int>playOrder;
+   vector<int>players;
+	
+    //still in progres All territories in the map are randomly assigned to players one by one in a round-robin fashion......
+	
+	
+   /*the order of the player is generated randomly*/
+	for (int i = 0; i < numberOfPlayers(); i++) {
+	    int random = (rand())% playerList.size();
+	    playOrder.push_back(players.at(random));
+	}
+
+	/*players are given a number of initial armies*/
+	int armies;
+	if (playerList.size() == 2) 
+	{
+		armies = 40;
+	}
+	else if (playerList.size() == 3) 
+	{
+		armies = 35;
+	}
+	else if (playerList.size() == 4)
+	{
+		armies = 30;
+	}
+	else if (playerList.size() == 5)
+	{
+		armies = 25;
 	}
 }
 
