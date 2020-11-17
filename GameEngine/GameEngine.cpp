@@ -117,9 +117,9 @@ void GameEngine::gameStart() {
     //Initialize number of players
      int numPlayers=numberOfPlayers();
     //Initialize Phase Observer
-     bool observerFunction = ObserverOption("'Phase Observer'");
+     bool phaseObserverOption = ObserverOption("'Phase Observer'");
     //Initialize Statistics Observer
-    bool observerFunction = ObserverOption("'Statistics Observer'");
+    bool StatisticsObserverOption = ObserverOption("'Statistics Observer'");
 
      for (int i = 1; i <= numPlayers; i++) {
          string PlayerName = "Player Number " + to_string(i);
