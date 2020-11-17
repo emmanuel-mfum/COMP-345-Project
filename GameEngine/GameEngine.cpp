@@ -14,7 +14,7 @@ string GameEngine::mapSelection() {
 }
 
 
-int GameEngine::playerSelection() {
+int GameEngine::numberOfPlayers() {
     //in progress
 }
 
@@ -52,7 +52,7 @@ void GameEngine::gameStart() {
     // choose map
      string map= mapSelection();
     // Select number of players 2-5
-     int numberOfPlayers=playerSelection();
+     int numberOfPlayers=numberOfPlayers();
     // Turn on/off observers here
      bool observerFunction = ObserverFunction();
 }
