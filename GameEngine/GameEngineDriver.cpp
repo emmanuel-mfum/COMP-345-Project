@@ -6,12 +6,13 @@ using namespace std;
 
 int main() {
 
-    GameEngine *engine = new GameEngine;
+    GameEngine* engine = new GameEngine;
 
     try {
         engine->gameStart();
-    } catch (exception &e) {
-        cout << "Invalid Map provided, the game will now terminate." << endl;
+    }
+    catch (exception& ex) {
+        cout << "Game was not able to start. Game will terminate now";
     };
 
     return 0;
