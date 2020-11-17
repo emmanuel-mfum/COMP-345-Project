@@ -54,8 +54,8 @@ void GameEngine::gameStart() {
     // choose map
      string map= mapSelection();
     // Select number of players 2-5
-     int numberOfPlayers=player_select();
+     int numberOfPlayers=playerSelection();
     // Turn on/off observers here
-     bool observerFunction=
+     bool observerFunction = ObserverFunction();
 }
 
