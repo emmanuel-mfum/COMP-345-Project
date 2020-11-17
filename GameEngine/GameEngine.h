@@ -31,5 +31,9 @@ public:
 	static void gameStart();
 	static string mapSelection();
 	static int playerSelection();
+	bool ObserverFunction();
 
+
+	
+	
 };
