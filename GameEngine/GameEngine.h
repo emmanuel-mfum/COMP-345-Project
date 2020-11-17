@@ -37,7 +37,7 @@ public:
 
 	/*
 	part 2
-	void startupPhase();
 	*/
+	void startupPhase();
 
 };
