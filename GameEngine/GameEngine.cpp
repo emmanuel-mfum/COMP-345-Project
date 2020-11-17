@@ -16,7 +16,23 @@ string GameEngine::mapSelection() {
 
 
 int GameEngine::numberOfPlayers() {
-    //in progress
+    cout << "============= Number Of Players =============" << endl;
+    int numOfPlayer;
+    bool flag = true;
+    while (flag) {
+        flag = false;
+        cin.clear();
+        flag&& cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout << "Enter the amount of players (2-5):";
+        cin >> numOfPlayer;
+
+        if (numOfPlayer < 2 || numOfPlayer > 5) {
+            cout << "Wrong amount try again" << endl;
+        }
+        flag = !cin.good() || numOfPlayer < 2 || numOfPlayer > 5;
+    }
+    cout << "\nYou have selected " << numOfPlayer << endl;
+    return numOfPlayer;
 }
 
 bool GameEngine::ObserverOption() {
