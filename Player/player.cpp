@@ -30,6 +30,20 @@ int Player::getPlayerId(){
     return this->playerId;
 }
 
+int Player::getReinforcementPool() {
+
+    return this->reinforcementPool;
+}
+
+void Player::setArmies(int army)
+{
+    this->armies = army;
+}
+
+void Player::setReinforcementPool(int r) {
+    this->reinforcementPool = r;
+}
+
 int Player::getAndUpdateIdForNew() {
     int newInt = Player::playerCounter;
     Player::playerCounter++;
