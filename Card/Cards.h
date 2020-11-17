@@ -49,3 +49,60 @@ private:
 	vector<Card*> cards;
 };
 
+
+class BombCard : public Card {
+public:
+	BombCard();// default constructor
+	BombCard(string t); // parameterized constructor
+	BombCard(const BombCard& c); // copy constructor
+	~BombCard(); // destructor
+	friend std::ostream& operator<<(std::ostream& out, const BombCard& toOut); // stream operator overload
+	BombCard& operator =(const BombCard& c); // assignment operator overload
+
+
+};
+
+class Reinforcement : public Card {
+public:
+	Reinforcement();// default constructor
+	Reinforcement(string t); // parameterized constructor
+	Reinforcement(const Reinforcement& c); // copy constructor
+	~Reinforcement(); // destructor
+	friend std::ostream& operator<<(std::ostream& out, const Reinforcement& toOut); // stream operator overload
+	Reinforcement& operator =(const Reinforcement& c); // assignment operator overload
+
+};
+
+class Blockade : public Card {
+public:
+	Blockade();// default constructor
+	Blockade(string t); // parameterized constructor
+	Blockade(const Blockade& c); // copy constructor
+	~Blockade(); // destructor
+	friend std::ostream& operator<<(std::ostream& out, const Blockade& toOut); // stream operator overload
+	Blockade& operator =(const Blockade& c); // assignment operator overload
+
+};
+
+
+class Airlift : public Card {
+public:
+	Airlift();// default constructor
+	Airlift(string t); // parameterized constructor
+	Airlift(const Airlift& c); // copy constructor
+	~Airlift(); // destructor
+	friend std::ostream& operator<<(std::ostream& out, const Airlift& toOut); // stream operator overload
+	Airlift& operator =(const Airlift& c); // assignment operator overload
+
+};
+
+class Diplomacy : public Card {
+public:
+	Diplomacy();// default constructor
+	Diplomacy(string t); // parameterized constructor
+	Diplomacy(const Diplomacy& c); // copy constructor
+	~Diplomacy(); // destructor
+	friend std::ostream& operator<<(std::ostream& out, const Diplomacy& toOut); // stream operator overload
+	Diplomacy& operator =(const Diplomacy& c); // assignment operator overload
+
+};
