@@ -104,3 +104,34 @@ void  GameEngine::issueOrdersPhase(Player* playerList){
             playerList[i]->issueOrder();
         }
 };
+
+void GameEngine::reinforcementPhase(Player* playerList){
+    int bonus;
+    int armies;
+       
+    armies=3;
+    for (int i = 0; i < playerList.size(); i++)
+    {
+        bonus= (int) (playerList->ownedTerritories/3);
+             
+        //calcuate the contient bouns
+        //Still figuring how to check player owns all territories
+        //if (){
+        //
+        /}
+        armies +=bonus;
+        playerList->setsetReinforcementPool(armies);
+    }
+};
+
+void GameEngine::mainGameLoop() {
+    bool Gameover=true;
+    
+    while (Gameover){
+        Gameover=false;
+        reinforcementPhase();
+        issueOrdersPhase();
+        executeOrdersPhase();
+        //Still coding
+    }
+}
