@@ -423,7 +423,14 @@ bool Map::validate() {
 	return true;
 }
 
-vector<Country*>Map::getCountries() {
+vector<Country*> Map::getCountries() {
+	// return all countries on the map
+	vector<Country*> countries;
+	for (MapComponent* m : this->mapTerritories) {
+		if (m->getTerritoryType() == TerritoryType::Country) {
+			countries.push_back(dynamic_cast<Country*>(m));
+		}
+	}
 	return countries;
 }
 
