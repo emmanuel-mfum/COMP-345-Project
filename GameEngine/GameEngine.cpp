@@ -9,9 +9,6 @@ using namespace std;
 
 const char* GameEngine::directory = "../Map_Directory/";
 
-
-
-
 string GameEngine::mapSelection() {
     //in progress
 }
