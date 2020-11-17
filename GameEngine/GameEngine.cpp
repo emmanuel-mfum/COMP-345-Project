@@ -35,8 +35,8 @@ GameEngine::GameEngine() {
 
 //copy constructor
 GameEngine::GameEngine(const GameEngine& gameEngine) {
-    currentPlayer = gameEngine.currentPlayer;
-    players = gameEngine.players;
+    Player = gameEngine.Player;
+    playerList = gameEngine.playerList;
     map = gameEngine.map;
     deck = gameEngine.deck;
 }
