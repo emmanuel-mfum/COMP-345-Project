@@ -7,7 +7,7 @@
 
 using namespace std;
 
-
+class Order;
 
 class Player {
 private:
@@ -15,6 +15,7 @@ private:
     static Map* worldMap;
     int playerId;
     int armies;
+    int reinforcementPool;
 
     vector<Country*> ownedTerritories;
 
@@ -31,6 +32,9 @@ public:
     friend std::ostream& operator<<(std::ostream& out, const Player& toOut);
     int getArmies();
     int getPlayerId();
+    int getReinforcementPool();
+    void setArmies(int army);
+    void setReinforcementPool(int r);
     //the vector of Country pointers to defend
     vector<Country*> toDefend();
     //the vector of territory pointers to attack
