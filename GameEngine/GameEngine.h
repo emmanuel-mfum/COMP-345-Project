@@ -3,23 +3,29 @@
 #include "Player.h"
 #include "Cards.h"
 
-#include <list>
+
+
+#include <string>
+#include <iostream>
 
 
 class Player;
 class Deck;
 class Map;
-class Continent;
 
 
 class GameEngine
 {
 private :
-
 	list <Player> playerList;
-	Player* Player;
+	Player* player;
 	Map* map;
 	Deck* deck;
+
+	static string mapSelection();
+	static int numberOfPlayers();
+	static bool ObserverOption();
+	
 
 public:
 	
@@ -27,18 +33,11 @@ public:
 
 	GameEngine();
 	~GameEngine();
+	void gameStart();
 
-	static void gameStart();
-	static string mapSelection();
-	static int numberOfPlayers();
-	bool ObserverFunction();
-	
 	/*
 	part 2
 	void startupPhase();
 	*/
 
-
-	
-	
 };
