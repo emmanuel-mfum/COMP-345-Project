@@ -55,8 +55,12 @@ Deck::Deck() {
 	string types[] = { "BombCard","Reinforcement","Blockade","Airlift","Diplomacy" }; // the 5 possible types of cards
 	
 
-	for (int i = 0; i < number_of_cards; i++) { // populates the cards vector with all for types
-		cards.push_back(new Card(types[i % 5]));
+	for (int i = 0; i < 10; i++) {
+		cards.push_back(new BombCard(types[0]));
+		cards.push_back(new Reinforcement(types[1]));
+		cards.push_back(new Blockade(types[2]));
+		cards.push_back(new Airlift(types[3]));
+		cards.push_back(new Diplomacy(types[4]));
 	}
 	
 }
@@ -166,5 +170,124 @@ vector<Card*>Hand::getCards() { // return the vector of pointers to Cards
  }
 
 
+BombCard::BombCard():Card() { //default constructor
 
+ }
+
+ BombCard::BombCard(string t):Card(t) {
+	 //this->type = t; // set the type at creation
+ }
+
+ BombCard::~BombCard() {} // destructor
+
+ BombCard::BombCard(const BombCard& obj):Card(obj) { // copy constructor
+	 //this->type = obj.type;
+
+
+ }
+
+ BombCard& BombCard :: operator =(const BombCard& c) // assignment operator overload
+ {
+	 Card::operator =(c);
+	 //this->type = c.type;
+
+	 return *this;
+ }
+
+ Reinforcement::Reinforcement() :Card() { //default constructor
+
+ }
+
+ Reinforcement::Reinforcement(string t) : Card(t) {
+	 //this->type = t; // set the type at creation
+ }
+
+ Reinforcement::~Reinforcement() {} // destructor
+
+ Reinforcement::Reinforcement(const Reinforcement& obj) :Card(obj) { // copy constructor
+	 //this->type = obj.type;
+
+
+ }
+
+ Reinforcement& Reinforcement :: operator =(const Reinforcement& c) // assignment operator overload
+ {
+	 Card::operator =(c);
+	 //this->type = c.type;
+
+	 return *this;
+ }
+
+
+ Blockade::Blockade() :Card() { //default constructor
+
+ }
+
+ Blockade::Blockade(string t) : Card(t) {
+	 //this->type = t; // set the type at creation
+ }
+
+ Blockade::~Blockade() {} // destructor
+
+ Blockade::Blockade(const Blockade& obj) :Card(obj) { // copy constructor
+	 //this->type = obj.type;
+
+
+ }
+
+ Blockade& Blockade :: operator =(const Blockade& c) // assignment operator overload
+ {
+	 Card::operator =(c);
+	 //this->type = c.type;
+
+	 return *this;
+ }
+
+ Airlift::Airlift() :Card() { //default constructor
+
+ }
+
+ Airlift::Airlift(string t) : Card(t) {
+	 //this->type = t; // set the type at creation
+ }
+
+ Airlift::~Airlift() {} // destructor
+
+ Airlift::Airlift(const Airlift& obj) :Card(obj) { // copy constructor
+	 //this->type = obj.type;
+
+
+ }
+
+ Airlift& Airlift :: operator =(const Airlift& c) // assignment operator overload
+ {
+	 Card::operator =(c);
+	 //this->type = c.type;
+
+	 return *this;
+ }
+
+ Diplomacy::Diplomacy() :Card() { //default constructor
+
+ }
+
+ Diplomacy::Diplomacy(string t) : Card(t) {
+	 //this->type = t; // set the type at creation
+ }
+
+ Diplomacy::~Diplomacy() {} // destructor
+
+ Diplomacy::Diplomacy(const Diplomacy& obj) :Card(obj) { // copy constructor
+	 //this->type = obj.type;
+
+
+ }
+
+ Diplomacy& Diplomacy :: operator =(const Diplomacy& c) // assignment operator overload
+ {
+	 Card::operator =(c);
+	 //this->type = c.type;
+
+	 return *this;
+ }
 
