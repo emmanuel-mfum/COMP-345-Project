@@ -157,6 +157,7 @@ public:
 private:
 	Continent* parent;
 	int playerId;
+	int armies;
 };
 
 

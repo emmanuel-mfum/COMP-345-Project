@@ -360,6 +360,14 @@ int Country::getParentNumCountries() {
 	return this->parent->getNumCountries();
 }
 
+void Country::setArmiesOnTerritory(int a) {
+	this->armies = a;
+}
+
+int Country::getArmiesOnTerritory() {
+	return this->armies;
+}
+
 
 
 /* ========================================================================================================= */
