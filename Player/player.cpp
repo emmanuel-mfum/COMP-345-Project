@@ -185,6 +185,6 @@ void Player::addToReinforcements(int numArmies) {
     this->reinforcementPool += numArmies;
 }
 
-OrdersList Player::getList(){
+OrdersList* Player::getList(){
     return ol;
 }
