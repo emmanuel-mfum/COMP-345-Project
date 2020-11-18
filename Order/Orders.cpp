@@ -1,5 +1,7 @@
 #include "Orders.h"
 #include "Orders.h"
+#include "../Player/player.h"
+#include "../Map/Map.h"
 
 OrdersList::OrdersList(){}
 
@@ -36,6 +38,10 @@ std::ostream& operator<<(std::ostream& os, const Order& order) {
 Player* Order::getPlayer() {
     return this->player;
 };
+
+Country* Order::getCountry() {
+    return this->country;
+}
 
 //Class Constructor
 //Deploy::Deploy(){}
