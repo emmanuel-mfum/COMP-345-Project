@@ -532,7 +532,7 @@ void OrdersList::sort() {
     orders_.sort(OrdersList::compare);
 }
 
-std::list<std::unique_ptr<Order>> OrdersList::getList() const {
+std::list<std::unique_ptr<Order>>& OrdersList::getList() const {
     return orders_;
 }
 
