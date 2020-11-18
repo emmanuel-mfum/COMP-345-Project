@@ -41,7 +41,7 @@ public:
     //the vector of territory pointers to attack
     vector<Country*> toAttack();
     ////the vector of oder pointers to issueOrder
-    void issueOrder();
+    void issueOrder(int num);
     OrdersList *ol;
    
     void declareOwner(string countryName);

@@ -91,10 +91,48 @@ vector<Country*> Player::toAttack(){
     return toAttack;
 }
 //creates an order object and adds it to the list of orders
-void Player::issueOrder(){
-    Order o = Order();
-    this->ol->addOrder(o);
+void Player::issueOrder(int num){
+    switch (num)
+    {
+        case 1: {
+            Deploy deploy=Deploy("deploy");
+            ol->addOrder(deploy);
+            cout<< "Deployed"<<endl;
+            break;
+        }
+        case 2: {
+            Advance advance= Advance("advance");
+            ol->addOrder(advance);
+            cout<< "Advanced"<<endl;
+            break;
+        }
+        case 3:{
+            Bomb bomb=Bomb("bomb");
+            ol->addOrder(bomb);
+            cout<<"Bomb"<<endl;
+            break;
+        }
+        case 4: {
+            Blockade blockade=Blockade("blockade");
+            ol->addOrder(blockade);
+            cout<< "Blockade"<<endl;
+            break;
+        }
+        case 5:{
+            Airlift airlift=Airlift("airlift");
+            ol->addOrder(airlift);
+            cout<<"Airlift"<<endl;
+            break;
+        }
+        case 6:{
+            Negotiate negotiate=Negotiate("Negotaite");
+            ol->addOrder(negotiate);
+            cout<<"Negotiate"<<endl;
+            break;
+        }
+    }
 }
+
 
 
 void Player::declareOwner(string countryName) {
