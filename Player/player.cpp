@@ -35,6 +35,10 @@ int Player::getReinforcementPool() {
     return this->reinforcementPool;
 }
 
+void Player::setInitialArmySize(int size) {
+    this->armies = size;
+}
+
 void Player::setArmies(int army)
 {
     this->armies = army;

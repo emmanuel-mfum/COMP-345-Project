@@ -34,6 +34,7 @@ public:
     int getPlayerId();
     int getReinforcementPool();
     void setArmies(int army);
+    void setInitialArmySize(int army);
     void setReinforcementPool(int r);
     //the vector of Country pointers to defend
     vector<Country*> toDefend();

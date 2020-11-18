@@ -1,7 +1,7 @@
-#include "Map.h"
-#include "MapLoader.h"
-#include "Player.h"
-#include "Cards.h"
+#include "../Map/Map.h"
+#include "../MapLoader/MapLoader.h"
+#include "../Player/player.h"
+#include "../Card/Cards.h"
 #include <string>
 #include <iostream>
 
@@ -14,7 +14,8 @@ class Map;
 class GameEngine
 {
 private :
-	list <Player> playerList;
+	vector<Player*> playerList;
+	vector<Player*> playerOrder;
 	Player* player;
 	Map* map;
 	Deck* deck;

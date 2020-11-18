@@ -89,7 +89,8 @@ bool GameEngine::ObserverOption(string s) {
 //default constructor
 GameEngine::GameEngine() {
     player = new Player();
-    playerList = list<Player>();
+    this->playerList;
+    this->playerOrder;
     //map = new Map(); default constructor needed
     deck = new Deck();
 }
@@ -122,42 +123,52 @@ void GameEngine::gameStart() {
     bool StatisticsObserverOption = ObserverOption("'Statistics Observer'");
 
      for (int i = 1; i <= numPlayers; i++) {
-         string PlayerName = "Player Number " + to_string(i);
-         this->playerList.emplace_back(PlayerName);
+         this->playerList.push_back(new Player());
      }
 }
 
 void GameEngine::startupPhase(){
-   vector<int>playOrder;
-   vector<int>players;
-	
     //still in progres All territories in the map are randomly assigned to players one by one in a round-robin fashion......
 	
 	
-   /*the order of the player is generated randomly*/
-	for (int i = 0; i < numberOfPlayers(); i++) {
-	    int random = (rand())% playerList.size();
-	    playOrder.push_back(players.at(random));
+    /*the order of the player is generated randomly*/
+    vector<bool> isUsed(this->playerList.size());
+    for (int i = 0; i < this->playerList.size(); i++) {
+        isUsed[i] = false;
+    }
+
+    /*players are given a number of initial armies*/
+    int armies;
+    if (playerList.size() == 2)
+    {
+        armies = 40;
+    }
+    else if (playerList.size() == 3)
+    {
+        armies = 35;
+    }
+    else if (playerList.size() == 4)
+    {
+        armies = 30;
+    }
+    else if (playerList.size() == 5)
+    {
+        armies = 25;
+    }
+
+	for (int i = 0; i < this->playerList.size(); i++) {
+        while (true) {
+            int random = (rand()) % this->playerList.size();
+            if (isUsed[random] == false) {
+                this->playerOrder.push_back(this->playerList.at(i));
+                this->playerOrder.at(random)->setInitialArmySize(armies);
+                isUsed[random] = true;
+                break;
+            }
+        }
 	}
 
-	/*players are given a number of initial armies*/
-	int armies;
-	if (playerList.size() == 2) 
-	{
-		armies = 40;
-	}
-	else if (playerList.size() == 3) 
-	{
-		armies = 35;
-	}
-	else if (playerList.size() == 4)
-	{
-		armies = 30;
-	}
-	else if (playerList.size() == 5)
-	{
-		armies = 25;
-	}
+	
 }
 
 void  GameEngine::issueOrdersPhase(Player* playerList){
