@@ -141,10 +141,14 @@ void GameEngine::gameStart() {
          exit(0);
      }
 	
+     //Initialize new Deck
+     this->deck = new Deck();
+	
      //Initialize players
      for (int i = 1; i <= numPlayers; i++) {
          this->playerList.push_back(new Player());
      }
+     
 }
 
 void GameEngine::startupPhase(){
