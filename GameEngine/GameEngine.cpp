@@ -230,12 +230,51 @@ void GameEngine::startupPhase(){
     }
 }
 
-void  GameEngine::issueOrdersPhase(){
-    this->currentPhase = Phases::IssueOrder;
-        for (int i = 0; i < playerList.size(); i++)
+void GameEngine::issuingOrderPhase()
+{
+    int orderNb;
+
+    for (int i = 0; i < playerList.size(); i++)
+    {
+        int selection;
+        
+        //OrderSelection
+        cout << "Issue Order: ";
+        cout << "\nEnter 1 for \"Deploy\"";
+        cout << "\nEnter 2 for \"Advance\"";
+        cout << "\nEnter 3 for \"Bomb\"";
+        cout << "\nEnter 4 for \"Blockade\"";
+        cout << "\nEnter 5 for \"airlift\"";
+        cout << "\nEnter 6 for \"negotiate\"";
+        cout << "\nENTER 0 TO EXIT\n";
+        cout << ">>";
+        cin >> selection;
+
+        // [issue order]
+        if (selection == 0)
         {
-            playerList[i]->issueOrder();
+            break;
+        } else if(selection == 1)
+        {
+            this->playerList.at[i]->issueOrder(1);
+        } else if (selection  == 2)
+        {
+            this->playerList.at[i]->issueOrder(2);
+        } else if (selection  == 3)
+        {
+            this->playerList.at[i]->issueOrder(3);
+        }else if (selection  == 4)
+        {
+            this->playerList.at[i]->issueOrder(4);
+        }else if (selection  == 5)
+        {
+            this->playerList.at[i]->issueOrder(5);
+        }else if (selection  == 6)
+        {
+            this->playerList.at[i]->issueOrder(6);
         }
+    }
+    
 };
 
 void GameEngine::reinforcementPhase(){
