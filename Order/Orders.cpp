@@ -7,7 +7,7 @@ OrdersList::OrdersList(){}
 
 Order::Order(){}
 
-Order::Order(const std::string& type, Player* player, Country* country) : type_(type), player(player), country(country) {
+Order::Order(const std::string& type, Player* player, Country* country, int priority) : type_(type), player(player), country(country), priority_(priority) {
     std::cout <<"A \"" << type_ << "\" order has been created!" << std::endl;
 }
 
@@ -17,6 +17,10 @@ Order::Order(const Order& other) : type_(other.type_) { }
 
 const std::string& Order::getType() const {
     return type_;
+}
+
+int Order::getPriority() const {
+    return priority_;
 }
 
 //Validate method
@@ -50,7 +54,7 @@ Deploy::Deploy() :Order() {} // default constructor
 
 Deploy::~Deploy(){}
 
-Deploy::Deploy(const std::string& type , Player* player, Country* country) : Order(type, player, country) { }
+Deploy::Deploy(const std::string& type , Player* player, Country* country, int priority) : Order(type, Player* player, Country* country, priority) { }
 
 Deploy::Deploy(const Deploy& other) : Order(other.type_) { }
 
@@ -108,7 +112,7 @@ Advance::Advance(): Order() {} // default constructor
 
 Advance::~Advance(){}
 
-Advance::Advance(const std::string& type, Player* player, Country* country) : Order(type, player, country) { }
+Advance::Advance(const std::string& type, Player* player, Country* country, int priority) : Order(type, Player* player, Country* country, priority) { }
 
 Advance::Advance(const Advance& other) : Order(other.type_) { }
 
@@ -209,7 +213,7 @@ Bomb::Bomb():Order() {} // default constructor
 
 Bomb::~Bomb(){}
 
-Bomb::Bomb(const std::string& type, Player* player, Country* country) : Order(type, player, country) { }
+Bomb::Bomb(const std::string& type, Player* player, Country* country, int priority) : Order(type, Player* player, Country* country,priority) { }
 
 Bomb::Bomb(const Bomb& other) : Order(other.type_) { }
 
@@ -263,7 +267,7 @@ Blockade::Blockade():Order() {} // default constructor
 
 Blockade::~Blockade(){}
 
-Blockade::Blockade(const std::string& type, Player* player, Country* country) : Order(type, player, country) { }
+Blockade::Blockade(const std::string& type, Player* player, Country* country, int priority) : Order(type, Player* player, Country* country, priority) { }
 
 Blockade::Blockade(const Blockade& other) : Order(other.type_) { }
 
@@ -314,7 +318,7 @@ Airlift::Airlift():Order() {}
 
 Airlift::~Airlift(){}
 
-Airlift::Airlift(const std::string& type, Player* player, Country* country) : Order(type, player, country) { }
+Airlift::Airlift(const std::string& type, Player* player, Country* country, int priority) : Order(type, Player* player, Country* country, priority) { }
 
 Airlift::Airlift(const Airlift& other) : Order(other.type_) { }
 
@@ -416,7 +420,7 @@ void Airlift::execute() {
 
 Negotiate::~Negotiate(){}
 
-Negotiate::Negotiate(const std::string& type, Player* player, Country* country) : Order(type , player, country) { }
+Negotiate::Negotiate(const std::string& type, Player* player, Country* country, int priority) : Order(type , Player* player, Country* country, priority) { }
 
 Negotiate::Negotiate(const Negotiate& other) : Order(other.type_) {}
 
@@ -519,6 +523,19 @@ void OrdersList::executeOrders() {
 //Return size of list
 unsigned long OrdersList::getsize(){
     return orders_.size();
+}
+
+bool OrdersList::compare(const std::unique_ptr<Order>& o1, const std::unique_ptr<Order>& o2) {
+    std::cout << o2->getPriority() << std::endl;
+    return o1->getPriority() < o2->getPriority();
+}
+
+void OrdersList::sort() {
+    orders_.sort(OrdersList::compare);
+}
+
+std::list<std::unique_ptr<Order>> OrdersList::getList() const {
+    return orders_;
 }
 
 
