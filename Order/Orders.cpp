@@ -7,7 +7,7 @@ OrdersList::OrdersList(){}
 
 Order::Order(){}
 
-Order::Order(const std::string& type, Player* player, Country* country) : type_(type) player(player) country(country) {
+Order::Order(const std::string& type, Player* player, Country* country) : type_(type), player(player), country(country) {
     std::cout <<"A \"" << type_ << "\" order has been created!" << std::endl;
 }
 
