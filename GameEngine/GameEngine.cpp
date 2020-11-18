@@ -10,11 +10,6 @@ using namespace std;
 
 const char* GameEngine::directory = "../Map_Directory/";
 
-string GameEngine::mapSelection() {
-    //in progress
-}
-
-
 int GameEngine::numberOfPlayers() {
     cout << "============= Number Of Players =============" << endl;
     int numOfPlayer;
@@ -35,9 +30,59 @@ int GameEngine::numberOfPlayers() {
     return numOfPlayer;
 }
 
-bool GameEngine::ObserverOption() {
-    //in progress
+
+string GameEngine::mapSelection() {
+    vector<string> mapDirectory;
+    int mapNumber = 0;
+    for (const auto& mapFromDirectory : fs::directory_iterator(directory)) {
+        mapDirectory.push_back(mapFromDirectory.path().filename().string());
+        cout << "[ Map " << ++mapNumber << "] - Name : " << mapFromDirectory.path().filename();
+        cout << endl;
+    }
+    int choice;
+    bool flag = true;
+    while (flag) {
+        flag = false;
+        cin.clear();
+        flag&& cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout << "Choose a map according to the map number between 1 and " << mapNumber << " :";
+        cin >> choice;
+        if (choice < 1 || choice > mapNumber) {
+            cout << "Invalid choice, try again.";
+            cout << endl;
+        }
+        flag = !cin.good() || choice < 1 || choice > mapNumber;
+    }
+    cout << "\nThe map chosen is :" << mapDirectory.at(choice - 1) << endl;
+    return mapDirectory.at(choice - 1);
 }
+
+bool GameEngine::ObserverOption(string s) {
+    int input;
+    bool flag = true;
+    bool observer = false;
+
+    cout << "\nObserver Setting for " + s + "\n"<< endl;
+
+    while (flag) {
+        flag = false;
+        cin.clear();
+        flag&& cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout << "Enable the observer for " + s + " , type '1' for on and '0' for off: ";
+        cin >> input;
+        flag = !cin.good() || input != 1 && input != 0;
+    }
+    observer = input == 1;
+
+    if (observer == true) {
+        cout <<"\n"+ s + " is set to ON."<< endl;
+    }
+    if (observer == false) {
+        cout <<"\n"+ s + " is set to OFF."<< endl;
+    }
+    return observer;
+}
+
 
 
 
@@ -67,12 +112,14 @@ GameEngine::~GameEngine() {
 
 
 void GameEngine::gameStart() {
-    // choose map
+     //Initialize map
      string map= mapSelection();
-    // Select number of players 2-5
+    //Initialize number of players
      int numPlayers=numberOfPlayers();
-    // Turn on/off observers here
-     bool observerFunction = ObserverOption();
+    //Initialize Phase Observer
+     bool phaseObserverOption = ObserverOption("'Phase Observer'");
+    //Initialize Statistics Observer
+    bool StatisticsObserverOption = ObserverOption("'Statistics Observer'");
 
      for (int i = 1; i <= numPlayers; i++) {
          string PlayerName = "Player Number " + to_string(i);
@@ -81,19 +128,35 @@ void GameEngine::gameStart() {
 }
 
 void GameEngine::startupPhase(){
-    //still in progres.....
-    int numberOfArmies;
-		if (numberOfPlayers() == 2) {
-			numberOfArmies = 40;
-		}
-		else if (numberOfPlayers() == 3) {
-			numberOfArmies = 35;
-		}
-		else if (numberOfPlayers() == 4) {
-			numberOfArmies = 30;
-		}	
-		else if (numberOfPlayers() == 5) {
-			numberOfArmies = 25;
+   vector<int>playOrder;
+   vector<int>players;
+	
+    //still in progres All territories in the map are randomly assigned to players one by one in a round-robin fashion......
+	
+	
+   /*the order of the player is generated randomly*/
+	for (int i = 0; i < numberOfPlayers(); i++) {
+	    int random = (rand())% playerList.size();
+	    playOrder.push_back(players.at(random));
+	}
+
+	/*players are given a number of initial armies*/
+	int armies;
+	if (playerList.size() == 2) 
+	{
+		armies = 40;
+	}
+	else if (playerList.size() == 3) 
+	{
+		armies = 35;
+	}
+	else if (playerList.size() == 4)
+	{
+		armies = 30;
+	}
+	else if (playerList.size() == 5)
+	{
+		armies = 25;
 	}
 }
 

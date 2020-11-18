@@ -2,9 +2,6 @@
 #include "MapLoader.h"
 #include "Player.h"
 #include "Cards.h"
-
-
-
 #include <string>
 #include <iostream>
 
@@ -21,23 +18,17 @@ private :
 	Player* player;
 	Map* map;
 	Deck* deck;
-
+	bool phaseObserverOption;
+	bool StatisticsObserverOption;
 	static string mapSelection();
 	static int numberOfPlayers();
 	static bool ObserverOption();
-	
-
 public:
 	
 	static const char* directory;
-
 	GameEngine();
 	~GameEngine();
 	void gameStart();
-
-	/*
-	part 2
-	*/
 	void startupPhase();
 
 };
