@@ -205,9 +205,7 @@ void GameEngine::gameStart() {
 }
 
 void GameEngine::startupPhase(){
-    //still in progres All territories in the map are randomly assigned to players one by one in a round-robin fashion......
-	
-	
+   
     /*the order of the player is generated randomly*/
     vector<bool> isUsed(this->playerList.size());
     for (int i = 0; i < this->playerList.size(); i++) {
