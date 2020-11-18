@@ -7,18 +7,20 @@
 
 using namespace std;
 
-
+class Order;
 
 class Player {
 private:
     // declare a static Map so all players can see it
     static Map* worldMap;
-    int* playerId;
-    int* armies;
+    int playerId;
+    int armies;
+    int reinforcementPool;
 
-    vector<Territory*>* ownedTerritories;
+    vector<Country*> ownedTerritories;
 
-
+    static int playerCounter;
+    static int getAndUpdateIdForNew();
 
 public:
     //constructor
@@ -30,14 +32,21 @@ public:
     friend std::ostream& operator<<(std::ostream& out, const Player& toOut);
     int getArmies();
     int getPlayerId();
-    //the vector of territory pointers to defend
-    vector<Territory*> toDefend();
+    int getReinforcementPool();
+    void setArmies(int army);
+    void setInitialArmySize(int army);
+    void setReinforcementPool(int r);
+    int numOwnedCountries();
+    bool deservesContinentBonus();
+    void addToReinforcements(int numArmies);
+    //the vector of Country pointers to defend
+    vector<Country*> toDefend();
     //the vector of territory pointers to attack
-    vector<Territory*> toAttack();
+    vector<Country*> toAttack();
     ////the vector of oder pointers to issueOrder
     void issueOrder();
     OrdersList *ol;
-   
+    OrdersList* getList();
     void declareOwner(string countryName);
 
     // need to implement a setter method

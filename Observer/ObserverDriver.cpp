@@ -2,7 +2,8 @@
 #include <vector>
 #include <iostream>
 
-#include "Map.h"
+
+#include "Observer.h"
 
 
 using namespace std;
@@ -10,7 +11,13 @@ using namespace std;
 
 int main() {
 
+
 	Map* m = new Map("Risk Map");
+
+	GameStatsObserver* gso = new GameStatsObserver();
+
+	m->attachGameStatsObserver(gso);
+	gso->registerMap(m);
 
 	Country* france = new Country("France");
 	Continent* europe = new Continent("Europe");
