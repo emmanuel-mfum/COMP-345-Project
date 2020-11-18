@@ -133,7 +133,7 @@ void GameEngine::gameStart() {
      try {
          this->map = MapLoader::load_map(map);
      }
-     catch (const std::exception& e) {
+     catch (const exception& e) {
          cout << e.what() << endl;
 
          throw exception("Error. Invalid map.");
