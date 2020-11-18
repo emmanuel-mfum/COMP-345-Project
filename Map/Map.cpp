@@ -696,7 +696,7 @@ bool Map::deservesContinentBonus(int playerId) {
 			if (currentCountry->getPlayerOwnership() == playerId) {
 				if (ownershipByContinent.find(currentCountry->getParentId()) != ownershipByContinent.end()) {
 					// not found
-					pair<int, int> firstPair = pair(currentCountry->getParentNumCountries(), 1);
+					pair<int, int> firstPair = pair<int, int>(currentCountry->getParentNumCountries(), 1);
 					ownershipByContinent.insert(pair<int, pair<int, int>>(currentCountry->getParentId(), firstPair));
 				}
 				else {
