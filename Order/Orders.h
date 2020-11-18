@@ -21,7 +21,7 @@ public:
     virtual void execute() = 0;
     Player* getPlayer() {};
     Order* nextImpendingAttack; // not sure about that confusing
-    //Country* getCountry() {};
+    Country* getCountry() {};
 protected:
     const std::string type_;
     Player* player;
