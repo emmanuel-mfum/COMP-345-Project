@@ -92,45 +92,62 @@ vector<Country*> Player::toAttack(){
     return toAttack;
 }
 //creates an order object and adds it to the list of orders
-void Player::issueOrder(int num){
-    switch (num)
+void Player::issueOrder(){
+    vector<Country*> attack_list;
+    vector<Country*> defend_list;
+    
+    attack_list=toAttack();
+    defend_list=toDefend();
+    
+    int armies,temp;
+    
+    while (true){
+        armies=getReinforcementPool();
+        if (armies == 0){
+            break;
+        } else {
+            for (int i=0; i<defend_list.size(); i++){
+                temp=(int) (rand() %armies);
+                temp+=defend_list[i]->getArmiesOnTerritory();
+                defend_list[i]->setArmiesOnTerritory(temp);
+                armies=armies-temp;
+                setReinforcementPool(armies);
+                
+                if (armies==1){
+                    setReinforcementPool(0);
+                    temp=1;
+                    temp+=defend_list[i]->getArmiesOnTerritory();
+                    defend_list[i]->setArmiesOnTerritory(temp);
+                }
+            }
+        }
+    }
+    
+    int play1 = rand() % attack_list.size();
+    int Enemies = attack_list[play1]->getArmiesOnTerritory();
+    
+    int play2 = rand() % defend_list.size();
+    int Attack = defend_list[play2]->getArmiesOnTerritory();
+
+    if (Enemies < Attack){
+        Attack = Attack - Enemies;
+        attack_list[play1]->setArmiesOnTerritory(Attack);
+        defend_list[play2]->setArmiesOnTerritory(0);
+        //attack_list[play1]->setPlayerOwnership();         //Figuring out playerid
+    } else {
+        Enemies = Enemies - Attack;
+        attack_list[play1]->setArmiesOnTerritory(Enemies);
+        defend_list[play2]->setArmiesOnTerritory(0);
+    }
+    
+    int play3=rand()% attack_list.size();
+    int play4=rand()% defend_list.size();
+
+    if (play3 != play4)
     {
-        case 1: {
-            Deploy deploy=Deploy("deploy");
-            ol->addOrder(deploy);
-            cout<< "Deployed"<<endl;
-            break;
-        }
-        case 2: {
-            Advance advance= Advance("advance");
-            ol->addOrder(advance);
-            cout<< "Advanced"<<endl;
-            break;
-        }
-        case 3:{
-            Bomb bomb=Bomb("bomb");
-            ol->addOrder(bomb);
-            cout<<"Bomb"<<endl;
-            break;
-        }
-        case 4: {
-            Blockade blockade=Blockade("blockade");
-            ol->addOrder(blockade);
-            cout<< "Blockade"<<endl;
-            break;
-        }
-        case 5:{
-            Airlift airlift=Airlift("airlift");
-            ol->addOrder(airlift);
-            cout<<"Airlift"<<endl;
-            break;
-        }
-        case 6:{
-            Negotiate negotiate=Negotiate("Negotaite");
-            ol->addOrder(negotiate);
-            cout<<"Negotiate"<<endl;
-            break;
-        }
+        defend_list[play3]->setArmiesOnTerritory(0);
+        int temp=defend_list[play3]->getArmiesOnTerritory() + defend_list[play4]->getArmiesOnTerritory();
+        defend_list[play4]->setArmiesOnTerritory(temp);
     }
 }
 
