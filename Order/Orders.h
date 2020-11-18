@@ -14,7 +14,7 @@ friend std::ostream& operator<<(std::ostream& os, const Order& order);
 public:
     Order();
     ~Order();
-    Order(const std::string& type, Player* player, Country* country);
+    Order(const std::string& type, Player* player, Country* country, int priority);
     Order(const Order& other);
     const std::string& getType() const;
     virtual bool validate() = 0;
@@ -22,7 +22,9 @@ public:
     Player* getPlayer() {};
     Order* nextImpendingAttack; // not sure about that confusing
     Country* getCountry() {};
+    virtual int getPriority() const;
 protected:
+    const int priority_ = 0;
     const std::string type_;
     Player* player;
     Country* country;
@@ -34,7 +36,7 @@ class Deploy : public Order {
 public:
     Deploy();
     ~Deploy();
-    Deploy(const std::string& type, Player* player, Country* country);
+    Deploy(const std::string& type, Player* player, Country* country, int priority);
     Deploy(const Deploy& other);
     void execute();
     bool validate();
@@ -44,7 +46,7 @@ class Advance : public Order {
 public:
     Advance();
     ~Advance();
-    Advance(const std::string& type, Player* player, Country* country);
+    Advance(const std::string& type, Player* player, Country* country, int priority);
     Advance(const Advance& other);
     void execute();
     bool validate();
@@ -54,7 +56,7 @@ class Bomb : public Order {
 public:
     Bomb();
     ~Bomb();
-    Bomb(const std::string& type, Player* player, Country* country);
+    Bomb(const std::string& type, Player* player, Country* country, int priority);
     Bomb(const Bomb& other);
     void execute();
     bool validate();
@@ -64,7 +66,7 @@ class Blockade : public Order {
 public:
     Blockade();
     ~Blockade();
-    Blockade(const std::string& type, Player* player, Country* country);
+    Blockade(const std::string& type, Player* player, Country* country, int priority);
     Blockade(const Blockade& other);
     void execute();
     bool validate();
@@ -74,7 +76,7 @@ class Airlift : public Order {
 public:
     Airlift();
     ~Airlift();
-    Airlift(const std::string& type, Player* player, Country* country);
+    Airlift(const std::string& type, Player* player, Country* country, int priority);
     Airlift(const Airlift& other);
     void execute();
     bool validate();
@@ -84,7 +86,7 @@ class Negotiate : public Order {
 public:
     Negotiate();
     ~Negotiate();
-    Negotiate(const std::string& type, Player* player, Country* country);
+    Negotiate(const std::string& type, Player* player, Country* country, int priority);
     Negotiate(const Negotiate& other);
     void execute();
     bool validate();
@@ -100,6 +102,8 @@ public:
     void move(size index1, size index2);
     void executeOrders();
     unsigned long getsize();
+    const std::list<std::unique_ptr<Order>>& getList() const;
 private:
+    static bool compare(const std::unique_ptr<Order>& o1, const std::unique_ptr<Order>& o2);
     std::list<std::unique_ptr<Order>> orders_;
 };
