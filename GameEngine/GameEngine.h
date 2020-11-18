@@ -1,7 +1,10 @@
+#pragma once
+
 #include "../Map/Map.h"
 #include "../MapLoader/MapLoader.h"
 #include "../Player/player.h"
 #include "../Card/Cards.h"
+#include "../Observer/Observer.h"
 #include <string>
 #include <iostream>
 
@@ -15,7 +18,10 @@ enum class Phases {
 	Reinforcement = 1,
 	IssueOrder = 2,
 	ExecuteOrder = 3
+	
 };
+
+ostream& operator<<(ostream& out, Phases e);
 
 
 class GameEngine
@@ -27,8 +33,13 @@ private :
 	Map* map;
 	Deck* deck;
 	Phases currentPhase;
-	bool phaseObserverOption;
-	bool StatisticsObserverOption;
+
+	int currentPlayerIdx;
+	int currentPlayerReinf;
+	
+	GameStatsObserver* gsObs;
+	PhaseObserver* phaseObs;
+
 	static string mapSelection();
 	static int numberOfPlayers();
 	static bool ObserverOption(string s);
@@ -44,4 +55,8 @@ public:
 	void gameStart();
 	void startupPhase();
 	void mainGameLoop();
+
+	Phases getCurrentPhase();
+	int getPlayerAtCurIdx();
+	int getCurrentReinf();
 };

@@ -3,6 +3,7 @@
 #include "../MapLoader/MapLoader.h"
 #include "../Player/player.h"
 #include "../Card/Cards.h"
+#include "../Observer/Observer.h"
 #include <string>
 #include <iostream>
 #include <vector>
@@ -11,7 +12,29 @@
 namespace fs = std::filesystem;
 using namespace std;
 
+
 const char* GameEngine::directory = "../Map_Directory/";
+
+
+ostream& operator<<(ostream& out, Phases e) {
+    switch (e) {
+    case Phases::NIL:
+        out << "Set-Up";
+        break;
+    case Phases::Reinforcement:
+        out << "Reinforcement";
+        break;
+    case Phases::IssueOrder:
+        out << "Issue-Order";
+        break;
+    default:
+        out << "Execute-Order";
+        break;
+    }
+    return out;
+}
+
+
 
 int GameEngine::numberOfPlayers() {
     int numOfPlayer;
@@ -92,6 +115,10 @@ GameEngine::GameEngine() {
     this->playerList;
     this->playerOrder;
     this->currentPhase = Phases::NIL;
+    this->gsObs = nullptr;
+    this->phaseObs = nullptr;
+    this->currentPlayerIdx = 0;
+    this->currentPlayerReinf = 0;
     //map = new Map(); default constructor needed
     deck = new Deck();
 }
@@ -103,6 +130,10 @@ GameEngine::GameEngine(const GameEngine& gameEngine) {
     map = gameEngine.map;
     deck = gameEngine.deck;
     this->currentPhase = gameEngine.currentPhase;
+    this->gsObs = gameEngine.gsObs;
+    this->phaseObs = gameEngine.phaseObs;
+    this->currentPlayerIdx = gameEngine.currentPlayerIdx;
+    this->currentPlayerReinf = gameEngine.currentPlayerReinf;
 }
 
 //destructor
@@ -110,6 +141,20 @@ GameEngine::~GameEngine() {
     delete this->player;
     delete this->map;
     delete this->deck;
+    delete this->gsObs;
+    delete this->phaseObs;
+}
+
+Phases GameEngine::getCurrentPhase() {
+    return this->currentPhase;
+}
+
+int GameEngine::getPlayerAtCurIdx() {
+    return this->playerList.at(this->currentPlayerIdx)->getPlayerId();
+}
+
+int GameEngine::getCurrentReinf() {
+    return this->currentPlayerReinf;
 }
 
 
@@ -117,19 +162,25 @@ GameEngine::~GameEngine() {
 void GameEngine::gameStart() {
      //Getting map name
      string map= mapSelection();
-    //Getting number of players
+     //Getting number of players
      int numPlayers=numberOfPlayers();
-    //Initialize Phase Observer
+     //Initialize Phase Observer
      bool phaseObserverOption = ObserverOption("'Phase Observer'");
-    //Initialize Statistics Observer
-    bool StatisticsObserverOption = ObserverOption("'Statistics Observer'");
-   
-    //Creating observer objects
-     if (this->phaseObserverOption) {
-         phaseObserverObject = new PhaseObserver(this);
+     //Initialize Statistics Observer
+     bool statisticsObserverOption = ObserverOption("'Statistics Observer'");
+     
+     this->gsObs = new GameStatsObserver(this->map);
+     this->map->attachGameStatsObserver(this->gsObs);
+
+     this->phaseObs = new PhaseObserver(this);
+
+     //Creating observer objects
+     if (phaseObserverOption) {
+         this->phaseObs->turnOff();
      }
-     if (this->StatisticsObserverOption) {
-         StatisticsObserverObject = new StatsObserver(this);
+         
+     if (!statisticsObserverOption) {
+         this->gsObs->turnOff();
      }
 	
      //Initialize map
@@ -232,14 +283,16 @@ void GameEngine::startupPhase(){
 
 void  GameEngine::issueOrdersPhase(){
     this->currentPhase = Phases::IssueOrder;
-        for (int i = 0; i < playerList.size(); i++)
-        {
-            playerList[i]->issueOrder();
-        }
+    this->phaseObs->update();
+    for (int i = 0; i < playerList.size(); i++) {
+        // playerList[i]->issueOrder();
+    }
 };
 
 void GameEngine::reinforcementPhase(){
     this->currentPhase = Phases::Reinforcement;
+    this->phaseObs->update();
+
     int minArmies = 3;
     // TODO CONTINENT BONUS NEED TO COME FROM MAPLOADER
     int continentBonus = 3;
@@ -253,22 +306,26 @@ void GameEngine::reinforcementPhase(){
         armies += ((this->playerList.at(i)->deservesContinentBonus()) ? continentBonus : 0);
         // add to reinforcement pool
         this->playerList.at(i)->addToReinforcements(armies);
+        this->currentPlayerReinf = armies;
+        this->currentPlayerIdx = i;
+        this->phaseObs->update();
     }
 };
 
 
 void GameEngine::executeOrdersPhase() {
     this->currentPhase = Phases::ExecuteOrder;
+    this->phaseObs->update();
 }
 
 void GameEngine::mainGameLoop() {
-    bool Gameover=true;
-    
-    while (Gameover){
-        Gameover=false;
+    bool Gameover = true;
+
+    while (Gameover) {
+        Gameover = false;
         reinforcementPhase();
-        issueOrdersPhase();
-        executeOrdersPhase();
+        // issueOrdersPhase();
+        // executeOrdersPhase();
         //Still coding
     }
 }

@@ -23,6 +23,10 @@ Observer::Observer() {
 	this->isActive = true;
 }
 
+Observer::~Observer() {
+
+}
+
 void Observer::turnOff() {
 	this->isActive = false;
 }
@@ -48,7 +52,15 @@ GameStatsObserver::GameStatsObserver(Map* gameMap) : Observer() {
 	this->observedMap = gameMap;
 }
 
+GameStatsObserver::~GameStatsObserver() {
+	this->observedMap = nullptr;
+}
+
 void GameStatsObserver::update() {
+	if (!this->isActive) {
+		return;
+	}
+
 	map<int, int> countriesByPlayer;
 	for (Country* country : this->observedMap->getCountries()) {
 		if (country->getPlayerOwnership() != -1) {
@@ -75,12 +87,11 @@ void GameStatsObserver::update() {
 		float playerPct = ((float)(itr->second)) / ((float) this->observedMap->getNumCountries());
 		cout << "\n  Player " + to_string(itr->first) + " controls " + this->formatForOut(playerPct) + "%, " + to_string(itr->second) + " of " + to_string(this->observedMap->getNumCountries()) + " countries";
 	}
-	cout << "\n======================================================================\n\n";
+	cout << "\n======================================================================\n\n" << flush;
 }
 
 void GameStatsObserver::registerMap(Map* gameMap) {
-	this->observedMap = gameMap;
-	
+	this->observedMap = gameMap;	
 }
 
 /* ========================================================================================================= */
@@ -89,3 +100,27 @@ void GameStatsObserver::registerMap(Map* gameMap) {
 * PhaseObserver
 *
 */
+PhaseObserver::PhaseObserver(GameEngine* engine) {
+	this->engine = engine;
+	this->currentEnginePhase = Phases::NIL;
+}
+
+PhaseObserver::~PhaseObserver() {
+	this->engine = nullptr;
+}
+
+void PhaseObserver::update() {
+	if (!this->isActive) {
+		return;
+	}
+
+	if (this->currentEnginePhase != this->engine->getCurrentPhase()) {
+		cout << "\nPhaseObserver: Game moving from " << this->currentEnginePhase << " to " << this->engine->getCurrentPhase() << "\n" << endl;
+		this->currentEnginePhase = this->engine->getCurrentPhase();
+	} 
+	else {
+		if (this->currentEnginePhase == Phases::Reinforcement) {
+			cout << "\nPhaseObserver: Player " << this->engine->getPlayerAtCurIdx() << " reinforced with " << this->engine->getCurrentReinf() << "\n" << endl;
+		}
+	}
+}
