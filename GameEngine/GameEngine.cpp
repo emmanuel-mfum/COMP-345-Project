@@ -201,7 +201,27 @@ void GameEngine::startupPhase(){
          }
       }
     */
-	
+    vector<Country*> allCountries = this->map->getCountries();
+    vector<bool> ctryIdxAsgned;
+
+    for (int i = 0; i < allCountries.size(); i++) {
+        ctryIdxAsgned.push_back(false);
+    }
+
+    int playerIdx = 0;
+    for (int i = 0; i < allCountries.size(); i++) {
+        while (true) {
+            int random = (rand()) % allCountries.size();
+            if (ctryIdxAsgned[random] == false) {
+                ctryIdxAsgned[random] = true;
+                // assign to players in their original order or in their turn order?
+                // assign territory to player
+                this->playerList.at(playerIdx)->declareOwner(allCountries.at(random)->getTerritoryName());
+                playerIdx = (playerIdx + 1) % this->playerList.size();
+                break;
+            }
+        }
+    }
 }
 
 void  GameEngine::issueOrdersPhase(Player* playerList){
@@ -221,11 +241,7 @@ void GameEngine::reinforcementPhase(Player* playerList){
     {
         bonus= (int) (playerList->ownedTerritories/3);
              
-        //calcuate the contient bouns
-        //Still figuring how to check player owns all territories
-        //if (){
-        //
-        /}
+        
         armies +=bonus;
         playerList->setsetReinforcementPool(armies);
     }
