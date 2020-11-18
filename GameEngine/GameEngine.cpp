@@ -137,7 +137,8 @@ void GameEngine::gameStart() {
      catch (const exception& e) {
          cout << e.what() << endl;
 
-         throw exception("Error. Invalid map.");
+         cout << "Error. Invalid map.";
+         exit(0);
      }
 	
      //Initialize players
@@ -186,7 +187,20 @@ void GameEngine::startupPhase(){
             }
         }
 	}
-
+    /*
+    * 
+    * vector<Country*> allCountries = map->getCountries(); // getCountries would be easy to implement 
+      bool[size of allCountries] indexAssigned; // initially set all to false
+      for (country in allCountries) {
+          while (true) {
+           // newIndex = generate random int (to be used as index in allCountries, indexAssigned) bounded by the number of countries
+           // check if country at the newIndex is assigned
+           //   if country at new index is available, assigned it to a player
+           // set indexAssigned[newIndex] = true, to keep track of which countries are assigned
+           // break once assigned
+         }
+      }
+    */
 	
 }
 
