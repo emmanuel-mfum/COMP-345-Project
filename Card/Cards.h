@@ -73,26 +73,26 @@ public:
 
 };
 
-class Blockade : public Card {
+class BlockadeCard : public Card {
 public:
-	Blockade();// default constructor
-	Blockade(string t); // parameterized constructor
-	Blockade(const Blockade& c); // copy constructor
-	~Blockade(); // destructor
-	friend std::ostream& operator<<(std::ostream& out, const Blockade& toOut); // stream operator overload
-	Blockade& operator =(const Blockade& c); // assignment operator overload
+	BlockadeCard();// default constructor
+	BlockadeCard(string t); // parameterized constructor
+	BlockadeCard(const BlockadeCard& c); // copy constructor
+	~BlockadeCard(); // destructor
+	friend std::ostream& operator<<(std::ostream& out, const BlockadeCard& toOut); // stream operator overload
+	BlockadeCard& operator =(const BlockadeCard& c); // assignment operator overload
 
 };
 
 
-class Airlift : public Card {
+class AirliftCard : public Card {
 public:
-	Airlift();// default constructor
-	Airlift(string t); // parameterized constructor
-	Airlift(const Airlift& c); // copy constructor
-	~Airlift(); // destructor
-	friend std::ostream& operator<<(std::ostream& out, const Airlift& toOut); // stream operator overload
-	Airlift& operator =(const Airlift& c); // assignment operator overload
+	AirliftCard();// default constructor
+	AirliftCard(string t); // parameterized constructor
+	AirliftCard(const AirliftCard& c); // copy constructor
+	~AirliftCard(); // destructor
+	friend std::ostream& operator<<(std::ostream& out, const AirliftCard& toOut); // stream operator overload
+	AirliftCard& operator =(const AirliftCard& c); // assignment operator overload
 
 };
 
