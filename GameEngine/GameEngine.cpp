@@ -14,7 +14,6 @@ using namespace std;
 const char* GameEngine::directory = "../Map_Directory/";
 
 int GameEngine::numberOfPlayers() {
-    cout << "============= Number Of Players =============" << endl;
     int numOfPlayer;
     bool flag = true;
     while (flag) {
@@ -32,8 +31,6 @@ int GameEngine::numberOfPlayers() {
     cout << "\nYou have selected " << numOfPlayer << endl;
     return numOfPlayer;
 }
-
-
 string GameEngine::mapSelection() {
     vector<string> mapDirectory;
     int mapNumber = 0;
