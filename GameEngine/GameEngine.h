@@ -22,7 +22,7 @@ private :
 	bool StatisticsObserverOption;
 	static string mapSelection();
 	static int numberOfPlayers();
-	static bool ObserverOption();
+	static bool ObserverOption(string s);
 public:
 	
 	static const char* directory;
