@@ -46,7 +46,7 @@ public:
     ////the vector of oder pointers to issueOrder
     void issueOrder();
     OrdersList *ol;
-   
+    OrdersList getList();
     void declareOwner(string countryName);
 
     // need to implement a setter method
