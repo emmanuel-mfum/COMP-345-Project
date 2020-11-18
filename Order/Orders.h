@@ -14,7 +14,7 @@ friend std::ostream& operator<<(std::ostream& os, const Order& order);
 public:
     Order();
     ~Order();
-    Order(const std::string& type);
+    Order(const std::string& type, Player* player, Country* country);
     Order(const Order& other);
     const std::string& getType() const;
     virtual bool validate() = 0;
@@ -34,7 +34,7 @@ class Deploy : public Order {
 public:
     Deploy();
     ~Deploy();
-    Deploy(const std::string& type);
+    Deploy(const std::string& type, Player* player, Country* country);
     Deploy(const Deploy& other);
     void execute();
     bool validate();
@@ -44,7 +44,7 @@ class Advance : public Order {
 public:
     Advance();
     ~Advance();
-    Advance(const std::string& type);
+    Advance(const std::string& type, Player* player, Country* country);
     Advance(const Advance& other);
     void execute();
     bool validate();
@@ -54,7 +54,7 @@ class Bomb : public Order {
 public:
     Bomb();
     ~Bomb();
-    Bomb(const std::string& type);
+    Bomb(const std::string& type, Player* player, Country* country);
     Bomb(const Bomb& other);
     void execute();
     bool validate();
@@ -64,7 +64,7 @@ class Blockade : public Order {
 public:
     Blockade();
     ~Blockade();
-    Blockade(const std::string& type);
+    Blockade(const std::string& type, Player* player, Country* country);
     Blockade(const Blockade& other);
     void execute();
     bool validate();
@@ -74,7 +74,7 @@ class Airlift : public Order {
 public:
     Airlift();
     ~Airlift();
-    Airlift(const std::string& type);
+    Airlift(const std::string& type, Player* player, Country* country);
     Airlift(const Airlift& other);
     void execute();
     bool validate();
@@ -84,7 +84,7 @@ class Negotiate : public Order {
 public:
     Negotiate();
     ~Negotiate();
-    Negotiate(const std::string& type);
+    Negotiate(const std::string& type, Player* player, Country* country);
     Negotiate(const Negotiate& other);
     void execute();
     bool validate();
