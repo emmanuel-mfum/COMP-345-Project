@@ -146,6 +146,8 @@ public:
 	void setPlayerOwnership(int playerId);
 	string getContinentParentName();
 	int getPlayerOwnership();
+	void setArmiesOnTerritory(int a);
+	int getArmiesOnTerritory();
 
 
 private:
