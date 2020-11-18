@@ -112,15 +112,34 @@ GameEngine::~GameEngine() {
 
 
 void GameEngine::gameStart() {
-     //Initialize map
+     //Getting map name
      string map= mapSelection();
-    //Initialize number of players
+    //Getting number of players
      int numPlayers=numberOfPlayers();
     //Initialize Phase Observer
      bool phaseObserverOption = ObserverOption("'Phase Observer'");
     //Initialize Statistics Observer
     bool StatisticsObserverOption = ObserverOption("'Statistics Observer'");
+   
+    //Creating observer objects
+     if (this->phaseObserverOption) {
+         phaseObserverObject = new PhaseObserver(this);
+     }
+     if (this->StatisticsObserverOption) {
+         StatisticsObserverObject = new StatsObserver(this);
+     }
+	
+     //Initialize map
+     try {
+         this->map = MapLoader::load_map(map);
+     }
+     catch (const std::exception& e) {
+         cout << e.what() << endl;
 
+         throw exception("Error. Invalid map.");
+     }
+	
+     //Initialize players
      for (int i = 1; i <= numPlayers; i++) {
          string PlayerName = "Player Number " + to_string(i);
          this->playerList.emplace_back(PlayerName);
