@@ -102,6 +102,7 @@ public:
     void move(size index1, size index2);
     void executeOrders();
     unsigned long getsize();
+    void sort();
     const std::list<std::unique_ptr<Order>>& getList() const;
 private:
     static bool compare(const std::unique_ptr<Order>& o1, const std::unique_ptr<Order>& o2);
