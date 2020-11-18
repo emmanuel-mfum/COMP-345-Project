@@ -37,6 +37,7 @@ int Player::getReinforcementPool() {
 
 void Player::setInitialArmySize(int size) {
     this->armies = size;
+    this->reinforcementPool = size;
 }
 
 void Player::setArmies(int army)
@@ -152,4 +153,17 @@ void Player::declareOwner(string countryName) {
 void Player::setMap(Map* map) {
     // inside member functions, the players can now access worldMap to do things to territories and stuff
     Player::worldMap = map;
+}
+
+int Player::numOwnedCountries() {
+    return this->ownedTerritories.size();
+}
+
+bool Player::deservesContinentBonus() {
+    return Player::worldMap->deservesContinentBonus(this->playerId);
+}
+
+void Player::addToReinforcements(int numArmies) {
+    this->armies += numArmies;
+    this->reinforcementPool += numArmies;
 }

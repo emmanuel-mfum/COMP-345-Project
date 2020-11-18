@@ -10,6 +10,13 @@ class Player;
 class Deck;
 class Map;
 
+enum class Phases {
+	NIL = 0,
+	Reinforcement = 1,
+	IssueOrder = 2,
+	ExecuteOrder = 3
+};
+
 
 class GameEngine
 {
@@ -19,11 +26,16 @@ private :
 	Player* player;
 	Map* map;
 	Deck* deck;
+	Phases currentPhase;
 	bool phaseObserverOption;
 	bool StatisticsObserverOption;
 	static string mapSelection();
 	static int numberOfPlayers();
 	static bool ObserverOption(string s);
+
+	void reinforcementPhase();
+	void issueOrdersPhase();
+	void executeOrdersPhase();
 public:
 	
 	static const char* directory;
@@ -31,5 +43,5 @@ public:
 	~GameEngine();
 	void gameStart();
 	void startupPhase();
-
+	void mainGameLoop();
 };

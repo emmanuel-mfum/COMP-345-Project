@@ -36,6 +36,9 @@ public:
     void setArmies(int army);
     void setInitialArmySize(int army);
     void setReinforcementPool(int r);
+    int numOwnedCountries();
+    bool deservesContinentBonus();
+    void addToReinforcements(int numArmies);
     //the vector of Country pointers to defend
     vector<Country*> toDefend();
     //the vector of territory pointers to attack

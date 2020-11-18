@@ -80,6 +80,7 @@ public:
 	vector<MapComponent*> getAdjacentTerritories();
 	vector<Country*> getAdjacentCountries();
 	TerritoryType getTerritoryType();
+	int getId();
 	
 
 private:
@@ -115,6 +116,7 @@ public:
 	friend ostream& operator<<(ostream& out, const Continent& toOut);
 
 	void addVertex(Country* country);
+	int getNumCountries();
 
 
 private:
@@ -148,6 +150,8 @@ public:
 	int getPlayerOwnership();
 	void setArmiesOnTerritory(int a);
 	int getArmiesOnTerritory();
+	int getParentNumCountries();
+	int getParentId();
 
 
 private:
@@ -193,6 +197,8 @@ public:
 	int getNumCountries();
 
 	void attachGameStatsObserver(GameStatsObserver* gso);
+
+	bool deservesContinentBonus(int playerId);
 
 private:
 	string mapName;
