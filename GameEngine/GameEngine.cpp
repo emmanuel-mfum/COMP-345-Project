@@ -1,8 +1,8 @@
 
 #include "GameEngine.h"
-#include "MapLoader.h"
-#include "Player.h"
-#include "Cards.h"
+#include "../MapLoader/MapLoader.h"
+#include "../Player/player.h"
+#include "../Card/Cards.h"
 #include <string>
 #include <iostream>
 #include <vector>
