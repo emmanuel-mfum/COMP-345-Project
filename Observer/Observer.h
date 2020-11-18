@@ -5,21 +5,31 @@
 
 
 #include "../Map/Map.h"
-#include "../GameEngine/GameEngine.h"
 
 
 using namespace std;
 
+class Map;
+class Observer;
+class PhaseObserver;
+class GameStatsObserver;
+
 
 class Observer {
 public:
-	~Observer();
-
-	virtual void update();
+	Observer();
+	virtual void update() = 0;
+	void turnOff();
 	
 protected:
-	Observer();
+	
+	string formatForOut(float toFormat);
+
+private:
+	bool isActive;
+	
 };
+
 
 class PhaseObserver : public Observer {
 public:
@@ -34,11 +44,15 @@ private:
 	
 };
 
+
 class GameStatsObserver : public Observer {
 public:
 	GameStatsObserver();
-
-	~GameStatsObserver();
+	GameStatsObserver(Map* gameMap);
 
 	void update();
+	void registerMap(Map* map);
+
+private:
+	Map* observedMap;
 };

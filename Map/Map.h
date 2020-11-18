@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 
+#include "../Observer/Observer.h"
+
 
 using namespace std;
 /**
@@ -15,13 +17,12 @@ class MapComponent;
 class MapEdge;
 class Continent;
 class Country;
-
+class GameStatsObserver;
 
 
 enum class TerritoryType {
 	Country = 1,
-	Continent = 2,
-	Undefined = 3
+	Continent = 2
 };
 
 
@@ -63,13 +64,12 @@ private:
 */
 class MapComponent {
 public:
-	MapComponent(string territoryName);
 	MapComponent(string territoryName, TerritoryType t);
 	MapComponent(const MapComponent& source);
 
-	~MapComponent();
+	virtual ~MapComponent();
 
-	MapComponent& operator=(const MapComponent& rhs);
+	virtual MapComponent& operator=(const MapComponent& rhs);
 
 	friend ostream& operator<<(ostream& out, const MapComponent& toOut);
 
@@ -85,7 +85,6 @@ public:
 private:
 	static int getAndUpdateIdForNew();
 	static int componentCounter;
-	virtual void doNothing() {}
 
 protected:
 	TerritoryType territoryType;
@@ -120,7 +119,6 @@ public:
 
 private:
 	vector<Country*> vertices;
-	virtual void doNothing() {}
 };
 
 
@@ -147,12 +145,12 @@ public:
 	void setParent(Continent* parent);
 	void setPlayerOwnership(int playerId);
 	string getContinentParentName();
+	int getPlayerOwnership();
 
 
 private:
 	Continent* parent;
 	int playerId;
-	virtual void doNothing() {}
 };
 
 
@@ -168,13 +166,15 @@ private:
 class Map {
 public:
 	Map(string mapName);
+	Map(string mapName, GameStatsObserver* observer);
 	Map(const Map& source);
+
 
 	~Map();
 
 	Map& operator=(const Map& rhs);
 
-	friend std::ostream& operator<<(std::ostream& out, const Map& toOut);
+	friend ostream& operator<<(ostream& out, const Map& toOut);
 
 	bool territoryExists(string territoryName);
 	void addCountryByName(string continentName, string territoryName);
@@ -186,13 +186,18 @@ public:
 	bool edgeExists(MapComponent* territoryOne, MapComponent* territoryTwo);
 	bool validate();
 	Country* setPlayerOwnership(int playerId, string territoryName);
-	string getDisplayString();
-	vector<Country*>getCountries();
+	vector<Country*> getCountries();
+	int getNumContinents();
+	int getNumCountries();
+
+	void attachGameStatsObserver(GameStatsObserver* gso);
+
 private:
 	string mapName;
 	vector<Continent*> vertices;
 	vector<MapEdge*> edges;
 	vector<MapComponent*> mapTerritories;
-	vector<Country*>countries;
 	int findTerritory(string territoryName);
+
+	GameStatsObserver* registeredStatsObserver;
 };

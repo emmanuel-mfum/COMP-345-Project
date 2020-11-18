@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 #include "Map.h"
+#include "../Observer/Observer.h"
 
 
 int MapComponent::componentCounter = 0;
@@ -21,9 +22,13 @@ MapEdge::MapEdge(MapComponent* territoryOne, MapComponent* territoryTwo) {
 	this->territoryTwo = territoryTwo;
 }
 
+MapEdge::MapEdge(const MapEdge& source) {
+	this->territoryOne = source.territoryOne;
+	this->territoryTwo = source.territoryTwo;
+}
+
 MapEdge::~MapEdge() {
-	delete this->territoryOne;
-	delete this->territoryTwo;
+	// don't call delete, this object never creates the territories
 	this->territoryOne = NULL;
 	this->territoryTwo = NULL;
 }
@@ -103,10 +108,6 @@ int MapComponent::getAndUpdateIdForNew() {
 	return newInt;
 }
 
-MapComponent::MapComponent(string territoryName): MapComponent(territoryName, TerritoryType::Undefined) {
-
-}
-
 MapComponent::MapComponent(string territoryName, TerritoryType t) {
 	this->territoryType = t;
 	this->territoryId = MapComponent::getAndUpdateIdForNew();
@@ -114,10 +115,48 @@ MapComponent::MapComponent(string territoryName, TerritoryType t) {
 	this->connections;
 }
 
+MapComponent::MapComponent(const MapComponent& source) {
+	this->territoryType = source.territoryType;
+	this->territoryId = MapComponent::getAndUpdateIdForNew();
+	this->territoryName = source.territoryName;
+	this->connections.clear();
+	// copy the connections
+	for (MapEdge* e : source.connections) {
+		this->connections.push_back(e);
+	}
+}
 
 MapComponent::~MapComponent() {
-	// maybe this should delete all connections and components? 
+	// do not do anything, let Map delete all the territories and connections it created
 }
+
+MapComponent& MapComponent::operator=(const MapComponent& rhs) {
+	if (this == &rhs) {
+		return *this;
+	}
+
+	this->territoryType = rhs.territoryType;
+	this->territoryId = rhs.territoryId;
+	this->territoryName = rhs.territoryName;
+	this->connections.clear();
+
+	for (MapEdge* e : rhs.connections) {
+		this->connections.push_back(e);
+	}
+	return *this;
+}
+
+ostream& operator<<(ostream& out, const MapComponent& toOut) {
+	if ((const_cast<MapComponent&>(toOut)).getTerritoryType() == TerritoryType::Continent) {
+		// out << (dynamic_cast<Continent*>(const_cast<MapComponent&>(toOut)));
+		out << "This component is a Continent" << endl;
+	}
+	else {
+		out << "This component is a Country" << endl;
+	}
+	return out;
+}
+
 
 bool MapComponent::territoryNameMatches(string territoryName) {
 	return (this->territoryName.compare(territoryName) == 0);
@@ -183,9 +222,57 @@ Continent::Continent(string territoryName) : MapComponent(territoryName, Territo
 	this->vertices;
 }
 
+Continent::Continent(const Continent& source) : MapComponent(source) {
+	this->vertices;
+	
+	for (Country* c : source.vertices) {
+		this->vertices.push_back(c);
+	}
+}
+
+Continent::~Continent() {
+	// Map will delete all the objects
+}
+
+Continent& Continent::operator=(const Continent& rhs) {
+	if (this == &rhs) {
+		return *this;
+	}
+
+	this->territoryType = rhs.territoryType;
+	this->territoryId = rhs.territoryId;
+	this->territoryName = rhs.territoryName;
+	this->connections.clear();
+
+	for (MapEdge* e : rhs.connections) {
+		this->connections.push_back(e);
+	}
+
+	this->vertices.clear();
+
+	for (Country* c : rhs.vertices) {
+		this->vertices.push_back(c);
+	}
+
+	return *this;
+}
+
+ostream& operator<<(ostream& out, const Continent& toOut) {
+	out << "\n============================\n";
+	out << "Continent: " << toOut.territoryName << endl;
+	out << "  Constituent countries: " << to_string(toOut.vertices.size()) << endl;
+	out << "  Accessible continents: " << to_string(toOut.connections.size()) << endl;
+	out << "============================\n";
+
+	return out;
+}
+
+
 void Continent::addVertex(Country* country) {
 	this->vertices.push_back(country);
 }
+
+
 
 
 /* ========================================================================================================= */
@@ -202,6 +289,45 @@ Country::Country(string territoryName) : MapComponent(territoryName, TerritoryTy
 	this->playerId = -1;
 }
 
+Country::Country(const Country& source) : MapComponent(source) {
+	this->parent = source.parent;
+	this->playerId = source.playerId;
+}
+
+Country::~Country() {
+	// map will delete the countries and continents
+	this->parent = NULL;
+}
+
+Country& Country::operator=(const Country& rhs) {
+	if (this == &rhs) {
+		return *this;
+	}
+
+	this->territoryType = rhs.territoryType;
+	this->territoryId = rhs.territoryId;
+	this->territoryName = rhs.territoryName;
+	this->connections.clear();
+
+	for (MapEdge* e : rhs.connections) {
+		this->connections.push_back(e);
+	}
+
+	this->parent = rhs.parent;
+	this->playerId = rhs.playerId;
+	return *this;
+}
+
+ostream& operator<<(ostream& out, const Country& toOut) {
+	out << "\n============================\n";
+	out << "Country: " << toOut.territoryName << endl;
+	out << "  Member of: " << toOut.parent->getTerritoryName() << endl;
+	out << "  Accessible countries: " << to_string(toOut.connections.size()) << endl;
+	out << "============================\n";
+
+	return out;
+}
+
 void Country::setParent(Continent* parent) {
 	this->parent = parent;
 }
@@ -212,6 +338,10 @@ void Country::setPlayerOwnership(int playerId) {
 
 string Country::getContinentParentName() {
 	return this->parent->getTerritoryName();
+}
+
+int Country::getPlayerOwnership() {
+	return this->playerId;
 }
 
 
@@ -229,11 +359,85 @@ Map::Map(string mapName) {
 	this->vertices;
 	this->edges;
 	this->mapTerritories;
+	this->registeredStatsObserver = nullptr;
+}
+
+
+Map::Map(string mapName, GameStatsObserver* observer) {
+	this->mapName = mapName;
+	this->vertices;
+	this->edges;
+	this->mapTerritories;
+	this->registeredStatsObserver = observer;
+	this->registeredStatsObserver->registerMap(this);
+}
+
+
+Map::Map(const Map& source) {
+	this->mapName = source.mapName;
+
+	// should the observer be copied?!
+	this->registeredStatsObserver = source.registeredStatsObserver;
+
+	this->vertices.clear();
+	// copy continents
+	for (Continent* c : source.vertices) {
+		this->vertices.push_back(c);
+	}
+
+	this->edges.clear();
+	// copy edges
+	for (MapEdge* e : source.edges) {
+		this->edges.push_back(e);
+	}
+
+	this->mapTerritories.clear();
+	// copy all components
+	for (MapComponent* t: source.mapTerritories) {
+		this->mapTerritories.push_back(t);
+	}
+}
+
+Map& Map::operator=(const Map& rhs) {
+	if (this == &rhs) {
+		return *this;
+	}
+
+	this->mapName = rhs.mapName;
+	this->registeredStatsObserver = rhs.registeredStatsObserver;
+	this->vertices.clear();
+	// copy continents
+	for (Continent* c : rhs.vertices) {
+		this->vertices.push_back(c);
+	}
+
+	this->edges.clear();
+	// copy edges
+	for (MapEdge* e : rhs.edges) {
+		this->edges.push_back(e);
+	}
+
+	this->mapTerritories.clear();
+	// copy all components
+	for (MapComponent* t : rhs.mapTerritories) {
+		this->mapTerritories.push_back(t);
+	}
+
+	return *this;
+}
+
+ostream& operator<<(ostream& out, const Map& toOut) {
+	out << "\n===================================\n";
+	out << "MAP: " + toOut.mapName;
+	out << "\n  Continents: " + to_string(toOut.vertices.size());
+	out << "\n  Countries: " + to_string((toOut.mapTerritories.size() - toOut.vertices.size()));
+	out << "\n===================================\n\n";
+	return out;
 }
 
 
 Map::~Map() {
-
+	// TODO REMEMBER WHEN USING NEW, THEN DELETE ALL
 }
 
 
@@ -293,6 +497,7 @@ void Map::addCountryByReference(Continent* continent, Country* country) {
 	country->setParent(continent);
 	// add the country to the continent
 	continent->addVertex(country);
+	this->registeredStatsObserver->update();
 }
 
 void Map::addContinentByName(string continentName) {
@@ -438,12 +643,21 @@ Country* Map::setPlayerOwnership(int playerId, string territoryName) {
 	if (this->territoryExists(territoryName)) {
 		Country* terr = dynamic_cast<Country*>(this->mapTerritories.at(this->findTerritory(territoryName)));
 		terr->setPlayerOwnership(playerId);
+		this->registeredStatsObserver->update();
 		// return territory if found
 		return terr;
 	}
 	return nullptr;
 }
 
-/* 
-string getDisplayString();
-*/
+int Map::getNumContinents() {
+	return this->vertices.size();
+}
+
+int Map::getNumCountries() {
+	return this->mapTerritories.size() - this->vertices.size();
+}
+
+void Map::attachGameStatsObserver(GameStatsObserver* gso) {
+	this->registeredStatsObserver = gso;
+}
