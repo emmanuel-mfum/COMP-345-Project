@@ -50,7 +50,7 @@ Deploy::Deploy() :Order() {} // default constructor
 
 Deploy::~Deploy(){}
 
-Deploy::Deploy(const std::string& type , Player* player, Country* country) : Order(type, Player* player, Country* country) { }
+Deploy::Deploy(const std::string& type , Player* player, Country* country) : Order(type, player, country) { }
 
 Deploy::Deploy(const Deploy& other) : Order(other.type_) { }
 
@@ -108,7 +108,7 @@ Advance::Advance(): Order() {} // default constructor
 
 Advance::~Advance(){}
 
-Advance::Advance(const std::string& type, Player* player, Country* country) : Order(type, Player* player, Country* country) { }
+Advance::Advance(const std::string& type, Player* player, Country* country) : Order(type, player, country) { }
 
 Advance::Advance(const Advance& other) : Order(other.type_) { }
 
@@ -209,7 +209,7 @@ Bomb::Bomb():Order() {} // default constructor
 
 Bomb::~Bomb(){}
 
-Bomb::Bomb(const std::string& type, Player* player, Country* country) : Order(type, Player* player, Country* country) { }
+Bomb::Bomb(const std::string& type, Player* player, Country* country) : Order(type, player, country) { }
 
 Bomb::Bomb(const Bomb& other) : Order(other.type_) { }
 
@@ -263,7 +263,7 @@ Blockade::Blockade():Order() {} // default constructor
 
 Blockade::~Blockade(){}
 
-Blockade::Blockade(const std::string& type, Player* player, Country* country) : Order(type, Player* player, Country* country) { }
+Blockade::Blockade(const std::string& type, Player* player, Country* country) : Order(type, player, country) { }
 
 Blockade::Blockade(const Blockade& other) : Order(other.type_) { }
 
@@ -314,7 +314,7 @@ Airlift::Airlift():Order() {}
 
 Airlift::~Airlift(){}
 
-Airlift::Airlift(const std::string& type, Player* player, Country* country) : Order(type, Player* player, Country* country) { }
+Airlift::Airlift(const std::string& type, Player* player, Country* country) : Order(type, player, country) { }
 
 Airlift::Airlift(const Airlift& other) : Order(other.type_) { }
 
@@ -416,7 +416,7 @@ void Airlift::execute() {
 
 Negotiate::~Negotiate(){}
 
-Negotiate::Negotiate(const std::string& type, Player* player, Country* country) : Order(type , Player* player, Country* country) { }
+Negotiate::Negotiate(const std::string& type, Player* player, Country* country) : Order(type , player, country) { }
 
 Negotiate::Negotiate(const Negotiate& other) : Order(other.type_) {}
 
