@@ -344,6 +344,16 @@ int Country::getPlayerOwnership() {
 	return this->playerId;
 }
 
+void Country::setArmiesOnTerritory(int a)
+{
+	this->armies = a;
+}
+
+int Country::getArmiesOnTerritory()
+{
+	return this->armies;
+}
+
 
 
 /* ========================================================================================================= */
