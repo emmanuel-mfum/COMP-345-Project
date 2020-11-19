@@ -122,5 +122,16 @@ void PhaseObserver::update() {
 		if (this->currentEnginePhase == Phases::Reinforcement) {
 			cout << "\nPhaseObserver: Player " << this->engine->getPlayerAtCurIdx() << " reinforced with " << this->engine->getCurrentReinf() << "\n" << endl;
 		}
+		else if (this->currentEnginePhase == Phases::IssueOrder) {
+			cout << "\nPhaseObserver: Player " << this->engine->getPlayerAtCurIdx() << " issuing orders...\n" << endl;
+		}
+		else if (this->currentEnginePhase == Phases::ExecuteOrder) {
+			if (this->engine->startingPlayerExecute()) {
+				cout << "\nPhaseObserver: Player " << this->engine->getPlayerAtCurIdx() << " starting to execute orders...\n" << endl;
+			}
+			else {
+				cout << "\nPhaseObserver: Player " << this->engine->getPlayerAtCurIdx() << " executing `An Order`\n" << endl;
+			}
+		}
 	}
 }

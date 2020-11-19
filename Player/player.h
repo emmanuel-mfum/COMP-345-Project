@@ -19,7 +19,7 @@ private:
     int reinforcementPool;
 
     vector<Country*> ownedTerritories;
-
+    OrdersList* ol;
     static int playerCounter;
     static int getAndUpdateIdForNew();
 
@@ -30,7 +30,6 @@ public:
     ~Player();
     //copy constructor
     Player(const Player& pl);
-    friend std::ostream& operator<<(std::ostream& out, const Player& toOut);
     int getArmies();
     int getPlayerId();
     int getReinforcementPool();
@@ -38,7 +37,7 @@ public:
     void setInitialArmySize(int army);
     void setReinforcementPool(int r);
     int numOwnedCountries();
-    bool deservesContinentBonus();
+    int deservesContinentBonus();
     void addToReinforcements(int numArmies);
     //the vector of Country pointers to defend
     vector<Country*> toDefend();
@@ -46,7 +45,7 @@ public:
     vector<Country*> toAttack();
     ////the vector of oder pointers to issueOrder
     void issueOrder();
-    OrdersList *ol;
+    
     OrdersList* getList();
     void declareOwner(string countryName);
 

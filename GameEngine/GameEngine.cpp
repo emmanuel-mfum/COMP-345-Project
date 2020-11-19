@@ -120,6 +120,7 @@ GameEngine::GameEngine() {
     this->phaseObs = nullptr;
     this->currentPlayerIdx = 0;
     this->currentPlayerReinf = 0;
+    this->startPlayerExecute = true;
     this->map = nullptr;
     //map = new Map(); default constructor needed
     deck = new Deck();
@@ -135,6 +136,7 @@ GameEngine::GameEngine(const GameEngine& gameEngine) {
     this->phaseObs = gameEngine.phaseObs;
     this->currentPlayerIdx = gameEngine.currentPlayerIdx;
     this->currentPlayerReinf = gameEngine.currentPlayerReinf;
+    this->startPlayerExecute = gameEngine.startPlayerExecute;
 }
 
 //destructor
@@ -150,13 +152,27 @@ Phases GameEngine::getCurrentPhase() {
 }
 
 int GameEngine::getPlayerAtCurIdx() {
-    return this->playerList.at(this->currentPlayerIdx)->getPlayerId();
+    return this->playerOrder.at(this->currentPlayerIdx)->getPlayerId();
 }
 
 int GameEngine::getCurrentReinf() {
     return this->currentPlayerReinf;
 }
 
+
+void GameEngine::smallGameStart(Map* map, vector<Player*> playerOrder) {
+    this->map = map;
+    Player::setMap(this->map);
+    this->gsObs = new GameStatsObserver(this->map);
+    this->map->attachGameStatsObserver(this->gsObs);
+
+    this->phaseObs = new PhaseObserver(this);
+    //Initialize new Deck
+    this->deck = new Deck();
+
+    //Initialize players
+    this->playerOrder = playerOrder;
+}
 
 
 void GameEngine::gameStart() {
@@ -283,7 +299,9 @@ void  GameEngine::issueOrdersPhase(){
     this->currentPhase = Phases::IssueOrder;
     this->phaseObs->update();
     for (int i = 0; i < this->playerOrder.size(); i++) {
-        this->playerOrder[i]->issueOrder();
+        // this->playerOrder[i]->issueOrder();
+        this->currentPlayerIdx = i;
+        this->phaseObs->update();
     }
 };
 
@@ -292,18 +310,16 @@ void GameEngine::reinforcementPhase(){
     this->phaseObs->update();
 
     int minArmies = 3;
-    // TODO CONTINENT BONUS NEED TO COME FROM MAPLOADER
-    int continentBonus = 3;
     
-    for (int i = 0; i < playerList.size(); i++) {
+    for (int i = 0; i < playerOrder.size(); i++) {
         // get num based on current num countries
-        int armies = this->playerList.at(i)->numOwnedCountries() / 3;
+        int armies = this->playerOrder.at(i)->numOwnedCountries() / 3;
         // get min
         armies = (armies > 3) ? armies : minArmies;
         // add bonus if applicable
-        armies += ((this->playerList.at(i)->deservesContinentBonus()) ? continentBonus : 0);
+        armies += this->playerOrder.at(i)->deservesContinentBonus();
         // add to reinforcement pool
-        this->playerList.at(i)->addToReinforcements(armies);
+        this->playerOrder.at(i)->addToReinforcements(armies);
         this->currentPlayerReinf = armies;
         this->currentPlayerIdx = i;
         this->phaseObs->update();
@@ -312,15 +328,19 @@ void GameEngine::reinforcementPhase(){
 
 
 void GameEngine::executeOrdersPhase(){
+    this->currentPhase = Phases::ExecuteOrder;
     this->phaseObs->update();
-	/*
     for (int i =0; i < this->playerOrder.size(); i++){
-        this->playerOrder[i]->getList()->sort();
-        for (int j=0; j< this->playerOrder[i]->getList()->getsize() ;j++) {
-            this->playerOrder[i]->getList()[j]->execute();
+        this->currentPlayerIdx = i;
+        this->phaseObs->update();
+        this->startPlayerExecute = false;
+        // this->playerOrder[i]->getList()->sort();
+        for (int j = 0; j < 3; j++) { // this->playerOrder[i]->getList()->getSize();j++) {
+            // (this->playerOrder[i]->getList()->getList()[j])->execute();
+            this->phaseObs->update();
         }
+        this->startPlayerExecute = true;
     }
-    */
 }
 
 void GameEngine::mainGameLoop() {
@@ -330,7 +350,7 @@ void GameEngine::mainGameLoop() {
         Gameover = false;
         reinforcementPhase();
         issueOrdersPhase();
-        // executeOrdersPhase();
+        executeOrdersPhase();
         //Still coding
     }
 }
