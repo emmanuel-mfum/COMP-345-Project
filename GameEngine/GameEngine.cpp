@@ -15,7 +15,7 @@ using namespace std;
 class GameEngine;
 
 
-const char* GameEngine::directory = "../Map_Directory/";
+const char* GameEngine::directory = "C:/Users/lix11/Documents/GitHub/COMP-345-Project/Map_Directory/";
 
 
 ostream& operator<<(ostream& out, Phases e) {

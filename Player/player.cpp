@@ -130,6 +130,12 @@ void Player::issueOrder(){
                     temp+=defend_list[i]->getArmiesOnTerritory();
                     defend_list[i]->setArmiesOnTerritory(temp);
                 }
+
+                if (armies == 0) {
+
+                    break;
+                
+                }
             }
         }
     }
