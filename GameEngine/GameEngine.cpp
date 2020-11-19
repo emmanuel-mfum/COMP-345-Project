@@ -323,13 +323,16 @@ void GameEngine::executeOrdersPhase(){
 }
 
 void GameEngine::mainGameLoop() {
-    bool Gameover = true;
-
-    while (Gameover) {
-        Gameover = false;
+   while (playerList.size() >1){
         reinforcementPhase();
-        // issueOrdersPhase();
-        // executeOrdersPhase();
-        //Still coding
+        issueOrdersPhase();
+        executeOrdersPhase();
+        
+        for (int i=0; i<this->playerList.size();  i++){
+            if (this->playerList[i]->numOwnedCountries()==0){
+                std::cout<<this->playerList[i]->getPlayerId()<<" will be eliminated"<<std::endl;
+                //eliminate player
+            }
+        }
     }
 }
