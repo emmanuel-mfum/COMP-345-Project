@@ -282,8 +282,8 @@ void GameEngine::startupPhase(){
 void  GameEngine::issueOrdersPhase(){
     this->currentPhase = Phases::IssueOrder;
     this->phaseObs->update();
-    for (int i = 0; i < playerList.size(); i++) {
-        playerList[i]->issueOrder();
+    for (int i = 0; i < this->playerOrder.size(); i++) {
+        this->playerOrder[i]->issueOrder();
     }
 };
 
@@ -314,10 +314,11 @@ void GameEngine::reinforcementPhase(){
 void GameEngine::executeOrdersPhase(){
     this->phaseObs->update();
 	
-    for (int i =0; i < playerList.size(); i++){
-        playerList[i]->getList().sort();
-        for (int j=0; j< playerList.getList().size() ;j++) {
-            playerList[i]->getList()[j]->execute();
+    for (int i =0; i < this->playerOrder.size(); i++){
+        this->playerOrder[i]->getList()->sort();
+        std::list<std::unique_ptr<Order>>::iterator it;
+        for (itr = this->playerOrder[i]->getList()->getList().begin(); ) {
+            this->playerOrder[i]->getList()[j].execute();
         }
     }
 }
