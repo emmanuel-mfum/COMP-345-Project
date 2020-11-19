@@ -316,9 +316,8 @@ void GameEngine::executeOrdersPhase(){
 	
     for (int i =0; i < this->playerOrder.size(); i++){
         this->playerOrder[i]->getList()->sort();
-        std::list<std::unique_ptr<Order>>::iterator it;
-        for (itr = this->playerOrder[i]->getList()->getList().begin(); ) {
-            this->playerOrder[i]->getList()[j].execute();
+        for (int j=0; j< this->playerOrder[i]->getList()->getsize() ;j++) {
+            this->playerOrder[i]->getList()[j]->execute();
         }
     }
 }
