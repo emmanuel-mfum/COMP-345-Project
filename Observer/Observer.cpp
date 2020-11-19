@@ -84,7 +84,7 @@ void GameStatsObserver::update() {
 	cout << "\n  Countries: " + to_string(this->observedMap->getNumCountries());
 	cout << "\n";
 	for (map<int, int>::iterator itr = countriesByPlayer.begin(); itr != countriesByPlayer.end(); ++itr) {
-		float playerPct = ((float)(itr->second)) / ((float) this->observedMap->getNumCountries());
+		float playerPct = ((float)(itr->second)) / ((float) this->observedMap->getNumCountries()) * 100;
 		cout << "\n  Player " + to_string(itr->first) + " controls " + this->formatForOut(playerPct) + "%, " + to_string(itr->second) + " of " + to_string(this->observedMap->getNumCountries()) + " countries";
 	}
 	cout << "\n======================================================================\n\n" << flush;

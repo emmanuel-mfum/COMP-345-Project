@@ -271,8 +271,8 @@ void GameEngine::startupPhase(){
                 ctryIdxAsgned[random] = true;
                 // assign to players in their original order or in their turn order?
                 // assign territory to player
-                this->playerList.at(playerIdx)->declareOwner(allCountries.at(random)->getTerritoryName());
-                playerIdx = (playerIdx + 1) % this->playerList.size();
+                this->playerOrder.at(playerIdx)->declareOwner(allCountries.at(random)->getTerritoryName());
+                playerIdx = (playerIdx + 1) % this->playerOrder.size();
                 break;
             }
         }
