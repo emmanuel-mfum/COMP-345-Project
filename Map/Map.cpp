@@ -374,6 +374,9 @@ int Country::getArmiesOnTerritory() {
 	return this->armies;
 }
 
+int Country::getParentBonus() {
+	return this->parent->getBonus();
+}
 
 
 /* ========================================================================================================= */
@@ -696,18 +699,20 @@ void Map::attachGameStatsObserver(GameStatsObserver* gso) {
 	this->registeredStatsObserver = gso;
 }
 
-bool Map::deservesContinentBonus(int playerId) {
+int Map::deservesContinentBonus(int playerId) {
 	map<int, pair<int, int>> ownershipByContinent;
+	map<int, int> contBonusMap;
 	
 	// determine how many countries on each continent the player owns
 	for (MapComponent* c : this->mapTerritories) {
 		if (c->getTerritoryType() == TerritoryType::Country) {
 			Country* currentCountry = dynamic_cast<Country*>(c);
 			if (currentCountry->getPlayerOwnership() == playerId) {
-				if (ownershipByContinent.find(currentCountry->getParentId()) != ownershipByContinent.end()) {
+				if (ownershipByContinent.find(currentCountry->getParentId()) == ownershipByContinent.end()) {
 					// not found
 					pair<int, int> firstPair = pair<int, int>(currentCountry->getParentNumCountries(), 1);
 					ownershipByContinent.insert(pair<int, pair<int, int>>(currentCountry->getParentId(), firstPair));
+					contBonusMap.insert(pair<int, int>(currentCountry->getParentId(), currentCountry->getParentBonus()));
 				}
 				else {
 					ownershipByContinent[currentCountry->getParentId()].second++;
@@ -716,14 +721,16 @@ bool Map::deservesContinentBonus(int playerId) {
 		}
 	}
 
+	int totalBonus = 0;
+
 	for (map<int, pair<int, int>>::iterator itr = ownershipByContinent.begin(); itr != ownershipByContinent.end(); ++itr) {
 		// num territories owned on the continent equals num territories on the continent;
 		if (itr->second.first == itr->second.second) {
-			return true;
+			totalBonus += contBonusMap[itr->first];
 		}
 	}
 
-	return false;
+	return totalBonus;
 }
 
 void Map::setContinentBonus(string continentName, int bonus) {

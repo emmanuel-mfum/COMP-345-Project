@@ -193,7 +193,7 @@ int Player::numOwnedCountries() {
     return this->ownedTerritories.size();
 }
 
-bool Player::deservesContinentBonus() {
+int Player::deservesContinentBonus() {
     return Player::worldMap->deservesContinentBonus(this->playerId);
 }
 

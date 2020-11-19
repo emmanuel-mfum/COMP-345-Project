@@ -35,6 +35,7 @@ private :
 	Deck* deck;
 	Phases currentPhase;
 
+	bool startPlayerExecute;
 	int currentPlayerIdx;
 	int currentPlayerReinf;
 	
@@ -45,9 +46,6 @@ private :
 	static int numberOfPlayers();
 	static bool ObserverOption(string s);
 
-	void reinforcementPhase();
-	void issueOrdersPhase();
-	void executeOrdersPhase();
 public:
 	
 	static const char* directory;
@@ -61,4 +59,11 @@ public:
 	Phases getCurrentPhase();
 	int getPlayerAtCurIdx();
 	int getCurrentReinf();
+	bool startingPlayerExecute() { return this->startPlayerExecute; }
+
+	void reinforcementPhase();
+	void issueOrdersPhase();
+	void executeOrdersPhase();
+
+	void smallGameStart(Map* map, vector<Player*> playerOrder);
 };
