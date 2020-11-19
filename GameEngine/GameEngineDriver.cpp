@@ -10,6 +10,8 @@ int main() {
 
     try {
         engine->gameStart();
+        engine->startupPhase();
+        engine->mainGameLoop();
     }
     catch (exception& ex) {
         cout << "Game was not able to start. Game will terminate now";

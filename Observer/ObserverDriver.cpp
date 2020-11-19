@@ -4,6 +4,7 @@
 
 
 #include "Observer.h"
+#include "../Map/Map.h"
 
 
 using namespace std;

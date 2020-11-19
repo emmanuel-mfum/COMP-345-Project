@@ -12,6 +12,8 @@
 class Player;
 class Deck;
 class Map;
+class GameStatsObserver;
+class PhaseObserver;
 
 enum class Phases {
 	NIL = 0,
@@ -29,7 +31,6 @@ class GameEngine
 private :
 	vector<Player*> playerList;
 	vector<Player*> playerOrder;
-	Player* player;
 	Map* map;
 	Deck* deck;
 	Phases currentPhase;
@@ -51,6 +52,7 @@ public:
 	
 	static const char* directory;
 	GameEngine();
+	GameEngine(const GameEngine& gameEngine);
 	~GameEngine();
 	void gameStart();
 	void startupPhase();

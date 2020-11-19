@@ -225,10 +225,12 @@ int MapComponent::getId() {
 
 Continent::Continent(string territoryName) : MapComponent(territoryName, TerritoryType::Continent) {
 	this->vertices;
+	this->continentBonus = 0;
 }
 
 Continent::Continent(const Continent& source) : MapComponent(source) {
 	this->vertices;
+	this->continentBonus = source.continentBonus;
 	
 	for (Country* c : source.vertices) {
 		this->vertices.push_back(c);
@@ -247,6 +249,7 @@ Continent& Continent::operator=(const Continent& rhs) {
 	this->territoryType = rhs.territoryType;
 	this->territoryId = rhs.territoryId;
 	this->territoryName = rhs.territoryName;
+	this->continentBonus = rhs.continentBonus;
 	this->connections.clear();
 
 	for (MapEdge* e : rhs.connections) {
@@ -295,11 +298,13 @@ int Continent::getNumCountries() {
 Country::Country(string territoryName) : MapComponent(territoryName, TerritoryType::Country) {
 	this->parent = nullptr;
 	this->playerId = -1;
+	this->armies = 0;
 }
 
 Country::Country(const Country& source) : MapComponent(source) {
 	this->parent = source.parent;
 	this->playerId = source.playerId;
+	this->armies = source.armies;
 }
 
 Country::~Country() {
@@ -323,6 +328,7 @@ Country& Country::operator=(const Country& rhs) {
 
 	this->parent = rhs.parent;
 	this->playerId = rhs.playerId;
+	this->armies = rhs.armies;
 	return *this;
 }
 
@@ -521,7 +527,9 @@ void Map::addCountryByReference(Continent* continent, Country* country) {
 	country->setParent(continent);
 	// add the country to the continent
 	continent->addVertex(country);
-	this->registeredStatsObserver->update();
+	if (this->registeredStatsObserver != nullptr) {
+		this->registeredStatsObserver->update();
+	}
 }
 
 void Map::addContinentByName(string continentName) {
@@ -667,7 +675,9 @@ Country* Map::setPlayerOwnership(int playerId, string territoryName) {
 	if (this->territoryExists(territoryName)) {
 		Country* terr = dynamic_cast<Country*>(this->mapTerritories.at(this->findTerritory(territoryName)));
 		terr->setPlayerOwnership(playerId);
-		this->registeredStatsObserver->update();
+		if (this->registeredStatsObserver != nullptr) {
+			this->registeredStatsObserver->update();
+		}
 		// return territory if found
 		return terr;
 	}
@@ -714,4 +724,17 @@ bool Map::deservesContinentBonus(int playerId) {
 	}
 
 	return false;
+}
+
+void Map::setContinentBonus(string continentName, int bonus) {
+	for (int i = 0; i < this->mapTerritories.size(); i++) {
+		if (
+			this->mapTerritories[i]->getTerritoryType() == TerritoryType::Continent &&
+			this->mapTerritories[i]->getTerritoryName().compare(continentName) == 0
+		) {
+			Continent* cont = dynamic_cast<Continent*>(this->mapTerritories[i]);
+			cont->setBonus(bonus);
+			break;
+		}
+	}
 }

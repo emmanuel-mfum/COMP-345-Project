@@ -1,9 +1,16 @@
-#include "Orders.h"
+#include <vector>
+
 #include "Orders.h"
 #include "../Player/player.h"
 #include "../Map/Map.h"
+#include <iterator>
+#include <algorithm>
 
-OrdersList::OrdersList(){}
+using namespace std;
+
+OrdersList::OrdersList(){
+    this->orders_;
+}
 
 Order::Order(){}
 
@@ -426,10 +433,6 @@ Negotiate::Negotiate(const Negotiate& other) : Order(other) {}
 
 Negotiate::Negotiate():Order(){}
 
-Negotiate::~Negotiate(){}
-
-Negotiate::Negotiate(const Negotiate& other) : Order(other) {}
-
 bool Negotiate::validate() {
     bool valid;
    
@@ -447,7 +450,8 @@ bool Negotiate::validate() {
             break;
         }
     }
-   
+    
+    return valid;
 
 }
 
@@ -462,7 +466,7 @@ void Negotiate::execute() {
         int otherPlayerID = targetTerritories[random]->getPlayerOwnership(); // gets id of another player
 
         // How to prevent attacks between the two players ?!
-        Order* incoming = this->player->nextImpendingAttack; // takes the nextImpendingAttack attribute of the current player
+        Order* incoming = this->nextImpendingAttack; // takes the nextImpendingAttack attribute of the current player
         Player* sourceAttack = incoming->getPlayer(); //  gets the player that is the source of that attack
         int playerIdBeingAttacked = sourceAttack->getPlayerId(); // get the id that is p
 
@@ -483,31 +487,28 @@ void Negotiate::execute() {
 OrdersList::~OrdersList(){}
 
 //Add method to add Orders to the list
-void OrdersList::addOrder(const Order& order) {
-    orders_.push_back(std::make_unique<Order>(order));
-    std::cout <<"A \"" <<order.getType() << "\" order has been added to the list!" << std::endl;
+void OrdersList::addOrder(Order* order) {
+    this->orders_.push_back(order);
 }
 
 //Delete method to delete object from list
-void OrdersList::Delete(size index) {
-    auto iter = orders_.cbegin();           //iterate to find index
-    std::advance(iter,index);
-    std::cout<<"The \""<< (*iter)->getType()<<"\" at index "<< index<<" has been removed from the list of orders"<<std::endl;
-    
-    orders_.erase(iter);
+void OrdersList::Delete(int index) {
+    vector<Order*>::iterator it = this->orders_.begin();
+    advance(it, index);
+    this->orders_.erase(it);
 }
 
 //Move method
-void OrdersList::move(size index1, size index2) {
-    auto iter1 = orders_.cbegin();
-    auto iter2 = orders_.cbegin();
-    std::advance(iter1, index1);
-    std::advance(iter2, index2);
-    std::cout << "The \""<<(*iter1)->getType() << "\" order at index " << index1
-              << " has been moved to index " << index2 << std::endl;
-    auto ptr = std::make_unique<Order>(**iter1);
-    orders_.insert(iter2, std::move(ptr));
-    orders_.erase(iter1);
+void OrdersList::move(int index1, int index2) {
+    vector<Order*>::iterator it = this->orders_.begin();
+    Order* moving = this->orders_[index1];
+    // remove it from index1
+    advance(it, index1);
+    this->orders_.erase(it);
+    // move it to index2
+    it = this->orders_.begin();
+    advance(it, index2);
+    this->orders_.insert(it, moving);
 }
 
 //Execute method
@@ -519,20 +520,20 @@ void OrdersList::executeOrders() {
 }
 
 //Return size of list
-unsigned long OrdersList::getsize(){
-    return orders_.size();
+unsigned long OrdersList::getSize(){
+    return this->orders_.size();
 }
 
-bool OrdersList::compare(const std::unique_ptr<Order>& o1, const std::unique_ptr<Order>& o2) {
+bool OrdersList::compare(Order* o1, Order* o2) {
     std::cout << o2->getPriority() << std::endl;
     return o1->getPriority() < o2->getPriority();
 }
 
 void OrdersList::sort() {
-    orders_.sort(OrdersList::compare);
+    std::sort(orders_.begin(), orders_.end(), OrdersList::compare);
 }
 
-const std::list<std::unique_ptr<Order>>& OrdersList::getList() const {
+vector<Order*> OrdersList::getList() {
     return orders_;
 }
 

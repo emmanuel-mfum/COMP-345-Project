@@ -10,10 +10,7 @@
 
 using namespace std;
 
-//default constructor
-MapLoader::MapLoader() {
-	this->newMap = nullptr;
-}
+
 //parameterized constructor
 MapLoader::MapLoader(string fName) {
 	this->newMap = load_map(fName);
@@ -84,11 +81,28 @@ Map* MapLoader::load_map(string fName) {
 		if (!readSplitToken && line.compare("") != 0) {
 			// have to read the component on the line
 			if (isContinents) {
-				// add the continent to the map
-				string continentName = line.substr(0, line.find(" "));
-				map->addContinentByName(continentName);
-				cout << "Created territory: " + continentName << endl;
-				continents->push_back(continentName);
+				// add the country to the map
+				size_t pos = 0;
+				string token;
+				int continentCounter = 0;
+				string continentName;
+				while ((pos = line.find(delimiter)) != string::npos) {
+					token = line.substr(0, pos);
+					// add the continent to the map
+					if (continentCounter == 0) {
+						continentName = token;
+						map->addContinentByName(continentName);
+						cout << "Created territory: " + continentName << endl;
+						continents->push_back(continentName);
+					}
+					else if (continentCounter == 1) {
+						int continentBonus = stoi(token);
+						map->setContinentBonus(continentName, continentBonus);
+					}
+
+					line.erase(0, pos + delimiter.length());
+					continentCounter++;
+				}
 			}
 			else if (isCountries) {
 				// add the country to the map

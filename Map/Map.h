@@ -117,10 +117,12 @@ public:
 
 	void addVertex(Country* country);
 	int getNumCountries();
+	void setBonus(int bonus) { this->continentBonus = bonus; }
 
 
 private:
 	vector<Country*> vertices;
+	int continentBonus;
 };
 
 
@@ -152,7 +154,6 @@ public:
 	int getArmiesOnTerritory();
 	int getParentNumCountries();
 	int getParentId();
-
 
 private:
 	Continent* parent;
@@ -200,6 +201,7 @@ public:
 	void attachGameStatsObserver(GameStatsObserver* gso);
 
 	bool deservesContinentBonus(int playerId);
+	void setContinentBonus(string continentName, int bonus);
 
 private:
 	string mapName;

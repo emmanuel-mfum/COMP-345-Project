@@ -14,6 +14,8 @@ class Map;
 class Observer;
 class PhaseObserver;
 class GameStatsObserver;
+class GameEngine;
+enum class Phases;
 
 
 class Observer {

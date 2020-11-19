@@ -8,6 +8,7 @@
 using namespace std;
 
 class Order;
+class Map;
 
 class Player {
 private:

@@ -5,6 +5,9 @@
 #include <list>
 #include <iterator>
 #include <memory>
+#include <vector>
+
+using namespace std;
 
 class Country;
 class Player;
@@ -19,9 +22,9 @@ public:
     const std::string& getType() const;
     virtual bool validate() = 0;
     virtual void execute() = 0;
-    Player* getPlayer() {};
+    Player* getPlayer();
     Order* nextImpendingAttack; // not sure about that confusing
-    Country* getCountry() {};
+    Country* getCountry();
     virtual int getPriority() const;
 protected:
     const int priority_ = 0;
@@ -93,19 +96,18 @@ public:
 };
 
 class OrdersList {
-typedef std::list<std::unique_ptr<Order>>::size_type size;
 public:
     OrdersList();
     ~OrdersList();
-    void addOrder(const Order& order);
-    void Delete(size index);
-    void move(size index1, size index2);
+    void addOrder(Order* order);
+    void Delete(int index);
+    void move(int index1, int index2);
     void executeOrders();
-    unsigned long getsize();
+    unsigned long getSize();
     void sort();
-    const std::list<std::unique_ptr<Order>>& getList() const;
+    vector<Order*> getList();
 
 private:
-    static bool compare(const std::unique_ptr<Order>& o1, const std::unique_ptr<Order>& o2);
-    std::list<std::unique_ptr<Order>> orders_;
+    static bool compare(Order* o1, Order* o2);
+    vector<Order*> orders_;
 };

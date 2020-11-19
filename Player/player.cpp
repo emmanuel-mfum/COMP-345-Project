@@ -22,6 +22,17 @@ Player::Player(){
     this->ownedTerritories;   
     OrdersList* ol = new OrdersList();
 }
+
+Player::Player(const Player& pl) {
+    this->armies = pl.armies;
+    this->playerId = Player::getAndUpdateIdForNew();
+    this->ownedTerritories;
+    for (int i = 0; i < pl.ownedTerritories.size(); i++) {
+        this->ownedTerritories.push_back(pl.ownedTerritories[i]);
+    }
+    OrdersList* ol = new OrdersList();
+}
+
 int Player::getArmies(){
    return this->armies;
 }

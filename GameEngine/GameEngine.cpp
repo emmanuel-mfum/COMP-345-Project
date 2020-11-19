@@ -12,6 +12,8 @@
 namespace fs = std::filesystem;
 using namespace std;
 
+class GameEngine;
+
 
 const char* GameEngine::directory = "../Map_Directory/";
 
@@ -111,7 +113,6 @@ bool GameEngine::ObserverOption(string s) {
 
 //default constructor
 GameEngine::GameEngine() {
-    player = new Player();
     this->playerList;
     this->playerOrder;
     this->currentPhase = Phases::NIL;
@@ -119,13 +120,13 @@ GameEngine::GameEngine() {
     this->phaseObs = nullptr;
     this->currentPlayerIdx = 0;
     this->currentPlayerReinf = 0;
+    this->map = nullptr;
     //map = new Map(); default constructor needed
     deck = new Deck();
 }
 
 //copy constructor
 GameEngine::GameEngine(const GameEngine& gameEngine) {
-    player = gameEngine.player;
     playerList = gameEngine.playerList;
     map = gameEngine.map;
     deck = gameEngine.deck;
@@ -138,7 +139,6 @@ GameEngine::GameEngine(const GameEngine& gameEngine) {
 
 //destructor
 GameEngine::~GameEngine() {
-    delete this->player;
     delete this->map;
     delete this->deck;
     delete this->gsObs;
@@ -168,30 +168,31 @@ void GameEngine::gameStart() {
      bool phaseObserverOption = ObserverOption("'Phase Observer'");
      //Initialize Statistics Observer
      bool statisticsObserverOption = ObserverOption("'Statistics Observer'");
-     
-     this->gsObs = new GameStatsObserver(this->map);
-     this->map->attachGameStatsObserver(this->gsObs);
-
-     this->phaseObs = new PhaseObserver(this);
-
-     //Creating observer objects
-     if (phaseObserverOption) {
-         this->phaseObs->turnOff();
-     }
-         
-     if (!statisticsObserverOption) {
-         this->gsObs->turnOff();
-     }
 	
      //Initialize map
      try {
-         this->map = MapLoader::load_map(map);
+         this->map = MapLoader::load_map(GameEngine::directory + map);
      }
      catch (const exception& e) {
          cout << e.what() << endl;
 
          cout << "Error. Invalid map.";
          exit(0);
+     }
+
+     Player::setMap(this->map);
+     this->gsObs = new GameStatsObserver(this->map);
+     this->map->attachGameStatsObserver(this->gsObs);
+
+     this->phaseObs = new PhaseObserver(this);
+
+     //Creating observer objects
+     if (!phaseObserverOption) {
+         this->phaseObs->turnOff();
+     }
+
+     if (!statisticsObserverOption) {
+         this->gsObs->turnOff();
      }
 	
      //Initialize new Deck
@@ -226,8 +227,7 @@ void GameEngine::startupPhase(){
     {
         armies = 30;
     }
-    else if (playerList.size() == 5)
-    {
+    else {
         armies = 25;
     }
 
@@ -235,8 +235,8 @@ void GameEngine::startupPhase(){
         while (true) {
             int random = (rand()) % this->playerList.size();
             if (isUsed[random] == false) {
-                this->playerOrder.push_back(this->playerList.at(i));
-                this->playerOrder.at(random)->setInitialArmySize(armies);
+                this->playerOrder.push_back(this->playerList.at(random));
+                this->playerOrder.at(i)->setInitialArmySize(armies);
                 isUsed[random] = true;
                 break;
             }
@@ -313,13 +313,14 @@ void GameEngine::reinforcementPhase(){
 
 void GameEngine::executeOrdersPhase(){
     this->phaseObs->update();
-	
+	/*
     for (int i =0; i < this->playerOrder.size(); i++){
         this->playerOrder[i]->getList()->sort();
         for (int j=0; j< this->playerOrder[i]->getList()->getsize() ;j++) {
             this->playerOrder[i]->getList()[j]->execute();
         }
     }
+    */
 }
 
 void GameEngine::mainGameLoop() {
@@ -328,7 +329,7 @@ void GameEngine::mainGameLoop() {
     while (Gameover) {
         Gameover = false;
         reinforcementPhase();
-        // issueOrdersPhase();
+        issueOrdersPhase();
         // executeOrdersPhase();
         //Still coding
     }
