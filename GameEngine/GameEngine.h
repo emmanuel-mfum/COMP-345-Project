@@ -38,6 +38,7 @@ private :
 	bool startPlayerExecute;
 	int currentPlayerIdx;
 	int currentPlayerReinf;
+	vector<bool> eliminated;
 	
 	GameStatsObserver* gsObs;
 	PhaseObserver* phaseObs;

@@ -125,6 +125,7 @@ GameEngine::GameEngine() {
     this->map = nullptr;
     //map = new Map(); default constructor needed
     deck = new Deck();
+    this->eliminated;
 }
 
 //copy constructor
@@ -138,6 +139,7 @@ GameEngine::GameEngine(const GameEngine& gameEngine) {
     this->currentPlayerIdx = gameEngine.currentPlayerIdx;
     this->currentPlayerReinf = gameEngine.currentPlayerReinf;
     this->startPlayerExecute = gameEngine.startPlayerExecute;
+    this->eliminated = gameEngine.eliminated;
 }
 
 //destructor
@@ -255,6 +257,7 @@ void GameEngine::startupPhase(){
             if (isUsed[random] == false) {
                 this->playerOrder.push_back(this->playerList.at(random));
                 this->playerOrder.at(i)->setInitialArmySize(armies);
+                this->eliminated.push_back(false);
                 isUsed[random] = true;
                 break;
             }
@@ -301,9 +304,11 @@ void  GameEngine::issueOrdersPhase(){
     this->currentPhase = Phases::IssueOrder;
     this->phaseObs->update();
     for (int i = 0; i < this->playerOrder.size(); i++) {
-        this->playerOrder[i]->issueOrder();
-        this->currentPlayerIdx = i;
-        this->phaseObs->update();
+        if (!this->eliminated[i]) {
+            this->playerOrder[i]->issueOrder();
+            this->currentPlayerIdx = i;
+            this->phaseObs->update();
+        }
     }
 };
 
@@ -314,17 +319,19 @@ void GameEngine::reinforcementPhase(){
     int minArmies = 3;
     
     for (int i = 0; i < playerOrder.size(); i++) {
-        // get num based on current num countries
-        int armies = this->playerOrder.at(i)->numOwnedCountries() / 3;
-        // get min
-        armies = (armies > 3) ? armies : minArmies;
-        // add bonus if applicable
-        armies += this->playerOrder.at(i)->deservesContinentBonus();
-        // add to reinforcement pool
-        this->playerOrder.at(i)->addToReinforcements(armies);
-        this->currentPlayerReinf = armies;
-        this->currentPlayerIdx = i;
-        this->phaseObs->update();
+        if (!this->eliminated[i]) {
+            // get num based on current num countries
+            int armies = this->playerOrder.at(i)->numOwnedCountries() / 3;
+            // get min
+            armies = (armies > 3) ? armies : minArmies;
+            // add bonus if applicable
+            armies += this->playerOrder.at(i)->deservesContinentBonus();
+            // add to reinforcement pool
+            this->playerOrder.at(i)->addToReinforcements(armies);
+            this->currentPlayerReinf = armies;
+            this->currentPlayerIdx = i;
+            this->phaseObs->update();
+        }
     }
 };
 
@@ -338,8 +345,12 @@ void GameEngine::executeOrdersPhase(){
         this->startPlayerExecute = false;
 
         vector<queue<Order*>> playerOrders;
+        int idx = 0;
         for (Player* player : this->playerOrder) {
-            playerOrders.push_back(player->getSortedQueue());
+            if (!this->eliminated[idx]) {
+                playerOrders.push_back(player->getSortedQueue());
+            }
+            idx++;
         }
 
         vector<bool> deploysFinished;
@@ -418,11 +429,17 @@ void GameEngine::mainGameLoop() {
         this->issueOrdersPhase();
         this->executeOrdersPhase();
 
-        
+        int counter = 0;
         for (Player* player : this->playerOrder) {
+            // check for winner
             if (player->toDefend().size() == this->map->getNumCountries()) {
                 gameover = true;
             }
+            // check if eliminated
+            else if (!this->eliminated[counter] && player->toDefend().size() == 0) {
+                this->eliminated[counter] = true;
+            }
+            counter++;
         }
     }
 }
