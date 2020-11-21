@@ -107,6 +107,7 @@ Card* Deck::draw() // draws a card from the deck
 	Card* a = cards.back();// stores the card from the back of the deck
 	Card* temp = new Card(*a);
 	cards.pop_back(); // remove the last card (the one just taken)
+	cards.pop_back(); // remove the last card (the one just taken)
 	cout << "The size of the deck is now " << cards.size() << endl; // indicates the remaining numbers of cards in the deck
 	delete a;
 	return temp; // returns the card removed.

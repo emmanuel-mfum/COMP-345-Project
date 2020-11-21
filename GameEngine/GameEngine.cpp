@@ -8,6 +8,7 @@
 #include <iostream>
 #include <vector>
 #include <filesystem>
+#include <queue>
 
 namespace fs = std::filesystem;
 using namespace std;
@@ -15,7 +16,7 @@ using namespace std;
 class GameEngine;
 
 
-const char* GameEngine::directory = "C:/Users/lix11/Documents/GitHub/COMP-345-Project/Map_Directory/";
+const char* GameEngine::directory = "../Map_Directory/";
 
 
 ostream& operator<<(ostream& out, Phases e) {
@@ -159,7 +160,9 @@ int GameEngine::getCurrentReinf() {
     return this->currentPlayerReinf;
 }
 
-
+/*
+* For the ObserverDriver;
+*/
 void GameEngine::smallGameStart(Map* map, vector<Player*> playerOrder) {
     this->map = map;
     Player::setMap(this->map);
@@ -213,12 +216,14 @@ void GameEngine::gameStart() {
 	
      //Initialize new Deck
      this->deck = new Deck();
+     this->deck->shuffleDeck();
 	
      //Initialize players
      for (int i = 1; i <= numPlayers; i++) {
          this->playerList.push_back(new Player());
      }
      
+     Player::setPlayersInGame(&this->playerList);
 }
 
 void GameEngine::startupPhase(){
@@ -231,16 +236,13 @@ void GameEngine::startupPhase(){
 
     /*players are given a number of initial armies*/
     int armies;
-    if (playerList.size() == 2)
-    {
+    if (playerList.size() == 2) {
         armies = 40;
     }
-    else if (playerList.size() == 3)
-    {
+    else if (playerList.size() == 3) {
         armies = 35;
     }
-    else if (playerList.size() == 4)
-    {
+    else if (playerList.size() == 4) {
         armies = 30;
     }
     else {
@@ -299,7 +301,7 @@ void  GameEngine::issueOrdersPhase(){
     this->currentPhase = Phases::IssueOrder;
     this->phaseObs->update();
     for (int i = 0; i < this->playerOrder.size(); i++) {
-        // this->playerOrder[i]->issueOrder();
+        this->playerOrder[i]->issueOrder();
         this->currentPlayerIdx = i;
         this->phaseObs->update();
     }
@@ -334,23 +336,78 @@ void GameEngine::executeOrdersPhase(){
         this->currentPlayerIdx = i;
         this->phaseObs->update();
         this->startPlayerExecute = false;
-        // this->playerOrder[i]->getList()->sort();
-        for (int j = 0; j < 3; j++) { // this->playerOrder[i]->getList()->getSize();j++) {
-            // (this->playerOrder[i]->getList()->getList()[j])->execute();
-            this->phaseObs->update();
+
+        vector<queue<Order*>> playerOrders;
+        for (Player* player : this->playerOrder) {
+            playerOrders.push_back(player->getSortedQueue());
+            player->clearOrders();
         }
+
+        vector<bool> deploysFinished;
+        for (int i = 0; i < this->playerOrder.size(); i++) {
+            deploysFinished.push_back(false);
+        }
+        int roundRobinIdx = 0;
+
+        // consume all deploys in round robin fashion
+        while (true) {
+            if (
+                !deploysFinished[roundRobinIdx] && 
+                playerOrders[roundRobinIdx].size() > 0 && 
+                playerOrders[roundRobinIdx].front()->getType().compare("Deploy") == 0
+            ) {
+                Order* deployOrder = playerOrders[roundRobinIdx].front();
+                deployOrder->execute();
+                playerOrders[roundRobinIdx].pop();
+            }
+            else if (!deploysFinished[roundRobinIdx]) {
+                deploysFinished[roundRobinIdx] = true;
+            }
+            bool breakNeeded = false;
+            for (bool b : deploysFinished) {
+                if (b) {
+                    breakNeeded = true;
+                    break;
+                }
+            }
+            if (breakNeeded) {
+                break;
+            }
+            roundRobinIdx = (roundRobinIdx + 1) % playerOrders.size();
+        }
+        roundRobinIdx = 0;
+        // consume all remaining orders
+        while (true) {
+            if (playerOrders[roundRobinIdx].size() > 0) {
+                Order* deployOrder = playerOrders[roundRobinIdx].front();
+                deployOrder->execute();
+                playerOrders[roundRobinIdx].pop();
+            }
+            bool breakNeeded = true;
+            for (auto orderQueue : playerOrders) {
+                if (orderQueue.size() > 0) {
+                    breakNeeded = false;
+                    break;
+                }
+            }
+            if (breakNeeded) {
+                break;
+            }
+            roundRobinIdx = (roundRobinIdx + 1) % playerOrders.size();
+        }
+        
         this->startPlayerExecute = true;
     }
 }
 
 void GameEngine::mainGameLoop() {
-    bool Gameover = true;
+    bool gameover = false;
 
-    while (Gameover) {
-        Gameover = false;
-        reinforcementPhase();
-        issueOrdersPhase();
-        executeOrdersPhase();
+    while (!gameover) {
+        gameover = true;
+        this->reinforcementPhase();
+        this->issueOrdersPhase();
+        this->executeOrdersPhase();
         //Still coding
     }
 }

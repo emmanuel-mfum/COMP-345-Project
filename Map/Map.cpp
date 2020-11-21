@@ -378,6 +378,14 @@ int Country::getParentBonus() {
 	return this->parent->getBonus();
 }
 
+void Country::deployArmies(int numDeploying) {
+	this->armies += numDeploying;
+}
+
+void Country::reduceArmies(int numLeavingToAttack) {
+	this->armies -= numLeavingToAttack;
+}
+
 
 /* ========================================================================================================= */
 /*

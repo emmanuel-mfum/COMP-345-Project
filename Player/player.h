@@ -2,26 +2,38 @@
 
 #include <vector>
 #include <string>
+#include <map>
 #include "../Map/Map.h"
 #include "../Order/Orders.h"
+#include "../Card/Cards.h"
+#include <queue>
 
 using namespace std;
 
 class Order;
+class OrdersList;
 class Map;
+class Hand;
 
 class Player {
 private:
     // declare a static Map so all players can see it
     static Map* worldMap;
+    static vector<Player*>* playersInGame;
     int playerId;
     int armies;
     int reinforcementPool;
+    map<int, int> deployments;
 
     vector<Country*> ownedTerritories;
     OrdersList* ol;
+    Hand* hand;
+
     static int playerCounter;
     static int getAndUpdateIdForNew();
+    void deployReinforcements();
+    void addToDeployments(int territoryIdx, int numToDeploy);
+    void sendToBattle(int territoryIdx, int numSlaughtering);
 
 public:
     //constructor
@@ -47,8 +59,15 @@ public:
     void issueOrder();
     
     OrdersList* getList();
+    queue<Order*> getSortedQueue();
     void declareOwner(string countryName);
+    void sustainedLosses(int numLossed);
+    void wasConquered(int numLossed, string territoryName);
+    void sustainOpponentLosses(int playerId, int numLossed);
+    void conquerOpponent(int playerId, int numLossed, string territoryName);
+    void clearOrders();
 
     // need to implement a setter method
     static void setMap(Map* worldMap);
+    static void setPlayersInGame(vector<Player*>* playersInGame);
 };

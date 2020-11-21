@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 #include "../Observer/Observer.h"
 
@@ -155,11 +156,14 @@ public:
 	int getParentNumCountries();
 	int getParentId();
 	int getParentBonus();
+	void deployArmies(int numDeploying);
+	void reduceArmies(int numLeavingToAttack);
 
 private:
 	Continent* parent;
 	int playerId;
 	int armies;
+
 };
 
 

@@ -5,6 +5,7 @@
 #include "../Map/Map.h"
 #include <iterator>
 #include <algorithm>
+#include <queue>
 
 using namespace std;
 
@@ -12,15 +13,31 @@ OrdersList::OrdersList(){
     this->orders_;
 }
 
-Order::Order(){}
+Order::Order() {
+    this->country = nullptr;
+    this->player = nullptr;
+    this->priority_ = -1;
+    this->type_ = nullptr;
+    this->failed = false;
+}
 
-Order::Order(const std::string& type, Player* player, Country* country, int priority) : type_(type), player(player), country(country), priority_(priority) {
-    std::cout <<"A \"" << type_ << "\" order has been created!" << std::endl;
+Order::Order(string type, Player* player, Country* country, int priority) {
+    this->type_ = type;
+    this->player = player;
+    this->country = country;
+    this->priority_ = priority;
+    this->failed = false;
 }
 
 Order::~Order(){}
 
-Order::Order(const Order& other) : type_(other.type_) { }
+Order::Order(const Order& other) {
+    this->type_ = other.type_;
+    this->player = other.player;
+    this->country = other.country;
+    this->priority_ = other.priority_;
+    this->failed = other.failed;
+}
 
 const std::string& Order::getType() const {
     return type_;
@@ -54,74 +71,127 @@ Country* Order::getCountry() {
     return this->country;
 }
 
+AttackingOrder::AttackingOrder() : Order() {
+    this->attacking = nullptr;
+    this->numAttackingArmies = 0;
+    this->conquered = false;
+    this->wasAttack = false;
+}
+
+
+AttackingOrder::AttackingOrder(const std::string& type, Player* player, Country* country, int priority, Country* target, int numAttackingArmies) :
+    Order(type, player, country, priority) {
+
+    this->attacking = target;
+    this->numAttackingArmies = numAttackingArmies;
+    this->conquered = false;
+    this->wasAttack = false;
+}
+
+AttackingOrder::AttackingOrder(const AttackingOrder& other): Order(other) {
+    this->attacking = other.attacking;
+    this->numAttackingArmies = other.numAttackingArmies;
+    this->conquered = other.conquered;
+    this->wasAttack = other.wasAttack;
+}
+
+AttackingOrder::~AttackingOrder() {}
+
+void AttackingOrder::attack() {
+    // TODO CHECK FOR BLOCK!
+
+    this->wasAttack = true;
+    int defenders = this->attacking->getArmiesOnTerritory(); // army defending the territory
+    int numOfAttackers = this->numAttackingArmies; // could be modified to another value
+    this->country->reduceArmies(numOfAttackers);
+
+    if (defenders != 0) {
+
+        for (int i = 0; i < numOfAttackers; i++) { // for each attacking army
+            // every attacker tries to kill a defender
+            int randomAssault = rand() % 100; // generate a number between 0 - 100
+            if (randomAssault < 60) {
+                // defenders are killed
+                defenders--;
+            }
+        }
+
+        for (int i = 0; i < this->attacking->getArmiesOnTerritory(); i++) {
+            int randomDefence = rand() % 100; // generate a number betweem 0 - 100
+            if (randomDefence < 70) {
+                // attackers are killed
+                numOfAttackers--;
+            }
+        }
+
+        
+    }
+
+    int attackingLossed = this->numAttackingArmies - numOfAttackers;
+    int defendingLossed = this->attacking->getArmiesOnTerritory() - defenders;
+    this->player->sustainedLosses(attackingLossed);
+
+    if (defenders == 0) { // if all the defenders are vanquished
+        this->conquered = true;
+        this->player->declareOwner(this->attacking->getTerritoryName()); // lets the map know that the player has now another territory
+        this->player->conquerOpponent(this->attacking->getPlayerOwnership(), defendingLossed, this->attacking->getTerritoryName());
+        this->attacking->setArmiesOnTerritory(numOfAttackers);
+        /*
+        * 
+        * TODO DRAW A CARD!
+        * 
+        * 
+        */
+    }
+    else {
+        this->player->sustainOpponentLosses(this->attacking->getPlayerOwnership(), defendingLossed);
+        this->country->deployArmies(numOfAttackers);
+        this->attacking->reduceArmies(defendingLossed);
+    }
+}
+
+
 //Class Constructor
 //Deploy::Deploy(){}
-
-Deploy::Deploy() :Order() {} // default constructor
+Deploy::Deploy() : Order() {
+    this->deploying = 0;
+}
 
 Deploy::~Deploy(){}
 
-Deploy::Deploy(const std::string& type , Player* player, Country* country, int priority) : Order(type, player, country, priority) { }
+Deploy::Deploy(Player* player, Country* country, int numToDeploy) : Order("Deploy", player, country, 1) {
+    this->deploying = numToDeploy;
+}
 
-Deploy::Deploy(const Deploy& other) : Order(other) { }
+Deploy::Deploy(const Deploy& other) : Order(other) {
+    this->deploying = other.deploying;
+}
 
 void  Deploy::execute() {
-    bool validity = this->validate();
 
-    if (validity == true) {
-        
-        vector<Country*> currentTerritories = this->player->toDefend(); // gets all the territories owned by the player
-        int random = rand() % currentTerritories.size(); // generate a random number between 0 and the number of territories owned by the player
-        Country* destination = currentTerritories[random]; // assign pointer to a random territory
-
-
-        int id = this->player->getPlayerId(); // gets the id of the current player
-        int reserve = this->player->getReinforcementPool(); // gets the number of armies in the reinforment pool
-        int reinforcement =  reserve; // calculates number of reinforcement
-        
-        destination->setArmiesOnTerritory(reinforcement + destination->getArmiesOnTerritory());
-        //currentPlayer->setReinforcementPool(reserve-reinforcement) not sure if necessary
+    if (this->validate()) {
+        this->country->deployArmies(this->deploying);
     }
     else {
-        cout << "Order was invalid " << endl;
+        this->failed = false;
     }
  
     
 }
 
-bool Deploy::validate()
-{
-    int id = this->player->getPlayerId(); // gets the id of the 
-    //Country* currentTerritory = this->country;
-    vector<Country*> currentTerritories = this->player->toDefend(); // gets all the territories owned by the player
-    bool owned; // boolean "counter"
-
-    for (int i = 0; i < currentTerritories.size(); i++) { // loops across all the territories owned by the player
-
-        if (id == currentTerritories[i]->getPlayerOwnership()) { // checks if the ids of the player and the of all territories owned by him are the same
-            owned = true; 
-        } 
-        else {  // else a territory is not owned by the player
-            owned = false;
-            break;
-        }
-
-
-    }
-
-    return owned; // return boolean variable
+bool Deploy::validate() {
+    return this->player->getPlayerId() == this->country->getPlayerOwnership();
     
 }
 
 //Advance::Advance(){}
+Advance::Advance() : AttackingOrder() {}
 
-Advance::Advance(): Order() {} // default constructor
+Advance::Advance(Player* player, Country* country, Country* attacking, int numAttackingArmies) : AttackingOrder("Advance",  player, country, 4, attacking, numAttackingArmies) { }
 
-Advance::~Advance(){}
+Advance::Advance(const Advance& other) : AttackingOrder(other) { }
 
-Advance::Advance(const std::string& type, Player* player, Country* country, int priority) : Order(type,  player, country, priority) { }
-
-Advance::Advance(const Advance& other) : Order(other) { }
+Advance::~Advance() {}
 
 bool Advance::validate() {
 
@@ -139,88 +209,29 @@ bool Advance::validate() {
 }
 
 void Advance::execute() {
-    bool validity = this->validate();
-    Country* sourceTerritory = this->country;
-    int movingArmies = sourceTerritory->getArmiesOnTerritory(); // gets army on the source territory
-    //int totalArmies = currentPlayer->getArmies();
-    int totalArmies = movingArmies; // armies on source territory
-    //currentPlayer->nextImpendingAttack = this; // try to use Paul's advice here
-    if (validity) {
-        vector<Country*> adjacent; // pointer to adjacent territories
-        //Country* currentTerritory = this->country; // current territory inside the Advance object
-        // adjacent = currentTerritory->getAdjacentCountries(); // points to territories adjacent to current territory
-        adjacent = this->player->toAttack(); // gets a vector of potential territories to attack
-
-         int random = rand() % adjacent.size(); // generate a random number
-
-         Country* nearby = adjacent[random]; // takes random adjacent territory
-
-         
-
-         int ownership = nearby->getPlayerOwnership();
-         int id = this->player->getPlayerId();
-
-         if (ownership != id) { // checks if we have to simulate an attack
-
-             nextImpendingAttack = this; //
-
-             int defenders = nearby->getArmiesOnTerritory(); // army defending the territory
-             int survivingDefenders = 0;
-             int numOfAttackers = totalArmies; // could be modified to another value 
-
-             for (int i = 0; i < numOfAttackers; i++) { // for each attacking army
-                 // every attacker tries to kill a defender
-                  int randomAssault = rand() % 100 ; // generate a number between 0 - 100
-                  int randomDefence = rand() % 100; // generate a number betweem 0 - 100
-                  if (randomAssault < 60) {
-                      // defenders are killed
-                      defenders--;
-                  }
-
-                  if (randomDefence < 70) {
-                      // attackers are killed
-                      numOfAttackers--;
-                  }
-
-                
-             }
-
-             if (defenders == 0) { // if all the defenders are vainquished
-                 string conquest = nearby->getTerritoryName();
-                 this->player->declareOwner(conquest); // lets the map know that the player has now another territory
-                 nearby->setArmiesOnTerritory(1); // bring armies on that territory, here I just move one army
-                 totalArmies--; // decrement the number of armies of the player
-                 this->player->setArmies(totalArmies); // sets it to a new value for the current Player
-
-                 // Moreover player should get a Card, but how ? Does the Player has a vector of Cards somewhere
-             }
-
+    
+    if (this->validate()) {
+         if (this->attacking->getPlayerOwnership() != this->country->getPlayerOwnership()) { // checks if we have to simulate an attack
+             this->attack();
              
-
-             nextImpendingAttack;
          }
          else {
-
-             nearby->setArmiesOnTerritory(1); // bring armies on that territory, here I just move one army
-             totalArmies--; // decrement the number of armies of the player
-             this->player->setArmies(totalArmies); // sets it to a new value for the current Player
-
+             this->country->deployArmies(this->numAttackingArmies);
          }
 
     }
     else {
-        cout << "Order is invalid " << endl;
+        this->failed = true;
     }
 }
 
 
 //Bomb::Bomb(){}
-
-Bomb::Bomb():Order() {} // default constructor
+Bomb::Bomb() {}
 
 Bomb::~Bomb(){}
 
-Bomb::Bomb(const std::string& type, Player* player, Country* country, int priority) : Order(type, player, country,priority) { }
+Bomb::Bomb(Player* player, Country* country) : Order("Bomb", player, country, 4) { }
 
 Bomb::Bomb(const Bomb& other) : Order(other) { }
 
@@ -270,11 +281,10 @@ void Bomb::execute() {
 
 //Blockade::Blockade(){}
 
-Blockade::Blockade() :Order() {} // default constructor
 
 Blockade::~Blockade(){}
 
-Blockade::Blockade(const std::string& type, Player* player, Country* country, int priority) : Order(type, player, country, priority) { }
+Blockade::Blockade(Player* player, Country* country) : Order("Blockade", player, country, 3) { }
 
 Blockade::Blockade(const Blockade& other) : Order(other) { }
 
@@ -319,13 +329,12 @@ void Blockade::execute() {
 
 }
 
-//Airlift::Airlift(){}
 
-Airlift::Airlift():Order() {}
+Airlift::Airlift(){}
 
 Airlift::~Airlift(){}
 
-Airlift::Airlift(const std::string& type, Player* player, Country* country, int priority) : Order(type, player, country,priority) { }
+Airlift::Airlift(Player* player, Country* country) : Order("Airlift", player, country, 2) { }
 
 Airlift::Airlift(const Airlift& other) : Order(other) { }
 
@@ -427,11 +436,10 @@ void Airlift::execute() {
 
 Negotiate::~Negotiate(){}
 
-Negotiate::Negotiate(const std::string& type, Player* player, Country* country, int priority) : Order(type , player, country, priority) { }
+Negotiate::Negotiate(Player* player, Country* country) : Order("Negotiate" , player, country, 4) { }
 
 Negotiate::Negotiate(const Negotiate& other) : Order(other) {}
 
-Negotiate::Negotiate():Order(){}
 
 bool Negotiate::validate() {
     bool valid;
@@ -483,6 +491,9 @@ void Negotiate::execute() {
 
 
 }
+
+
+
 
 OrdersList::~OrdersList(){}
 
@@ -537,3 +548,16 @@ vector<Order*> OrdersList::getList() {
     return orders_;
 }
 
+
+queue<Order*> OrdersList::getSortedQueue() {
+    this->sort();
+    queue<Order*> sortedOrders;
+    for (Order* o : this->orders_) {
+        sortedOrders.push(o);
+    }
+    return sortedOrders;
+}
+
+void OrdersList::clear() {
+    this->orders_.clear();
+}
