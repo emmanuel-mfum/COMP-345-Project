@@ -299,12 +299,16 @@ Country::Country(string territoryName) : MapComponent(territoryName, TerritoryTy
 	this->parent = nullptr;
 	this->playerId = -1;
 	this->armies = 0;
+	this->owner = nullptr;
+	this->armiesAdvancingDuringRound = 0;
 }
 
 Country::Country(const Country& source) : MapComponent(source) {
 	this->parent = source.parent;
 	this->playerId = source.playerId;
 	this->armies = source.armies;
+	this->owner = source.owner;
+	this->armiesAdvancingDuringRound = source.armiesAdvancingDuringRound;
 }
 
 Country::~Country() {
@@ -321,6 +325,7 @@ Country& Country::operator=(const Country& rhs) {
 	this->territoryId = rhs.territoryId;
 	this->territoryName = rhs.territoryName;
 	this->connections.clear();
+	this->owner = rhs.owner;
 
 	for (MapEdge* e : rhs.connections) {
 		this->connections.push_back(e);
@@ -329,6 +334,7 @@ Country& Country::operator=(const Country& rhs) {
 	this->parent = rhs.parent;
 	this->playerId = rhs.playerId;
 	this->armies = rhs.armies;
+	this->armiesAdvancingDuringRound = rhs.armiesAdvancingDuringRound;
 	return *this;
 }
 
@@ -346,8 +352,18 @@ void Country::setParent(Continent* parent) {
 	this->parent = parent;
 }
 
-void Country::setPlayerOwnership(int playerId) {
-	this->playerId = playerId;
+void Country::setPlayerOwnership(Player* player) {
+	if (player == nullptr) {
+		this->playerId = -1;
+		this->owner = nullptr;
+	}
+	else {
+		if (this->owner != nullptr && this->playerId != player->getPlayerId()) {
+			this->owner->lostCountry(this);
+		}
+		this->playerId = player->getPlayerId();
+		this->owner = player;
+	}
 }
 
 string Country::getContinentParentName() {
@@ -368,6 +384,9 @@ int Country::getParentNumCountries() {
 
 void Country::setArmiesOnTerritory(int a) {
 	this->armies = a;
+	if (this->armies < 0) {
+		cout << "UHOH";
+	}
 }
 
 int Country::getArmiesOnTerritory() {
@@ -382,8 +401,19 @@ void Country::deployArmies(int numDeploying) {
 	this->armies += numDeploying;
 }
 
-void Country::reduceArmies(int numLeavingToAttack) {
+int Country::reduceArmies(int numLeavingToAttack) {
+	if (numLeavingToAttack > this->armies) {
+		numLeavingToAttack = this->armies;
+	}
 	this->armies -= numLeavingToAttack;
+	if (this->armies < 0) {
+		cout << "UHOH";
+	}
+	return numLeavingToAttack;
+}
+
+void Country::sustainOpponentLosses(int numLost) {
+	this->owner->sustainedLosses(numLost);
 }
 
 
@@ -596,7 +626,9 @@ void Map::addEdgeByReference(MapComponent* territoryOne, MapComponent* territory
 		// connections between continents and countries are in the vertices of the continent
 		// create the edge between the territories
 		MapEdge* edge = new MapEdge(territoryOne, territoryTwo);
-
+		if (territoryOne->getTerritoryName().compare("Pluto-West") == 0 || territoryTwo->getTerritoryName().compare("Pluto-West") == 0) {
+			cout << "HERE" << endl;
+		}
 		// register the edge
 		this->edges.push_back(edge);
 		territoryOne->addEdge(edge);
@@ -682,10 +714,10 @@ vector<Country*> Map::getCountries() {
 	return countries;
 }
 
-Country* Map::setPlayerOwnership(int playerId, string territoryName) {
+Country* Map::setPlayerOwnership(Player* player, string territoryName) {
 	if (this->territoryExists(territoryName)) {
 		Country* terr = dynamic_cast<Country*>(this->mapTerritories.at(this->findTerritory(territoryName)));
-		terr->setPlayerOwnership(playerId);
+		terr->setPlayerOwnership(player);
 		if (this->registeredStatsObserver != nullptr) {
 			this->registeredStatsObserver->update();
 		}

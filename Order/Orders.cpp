@@ -102,8 +102,8 @@ void AttackingOrder::attack() {
 
     this->wasAttack = true;
     int defenders = this->attacking->getArmiesOnTerritory(); // army defending the territory
-    int numOfAttackers = this->numAttackingArmies; // could be modified to another value
-    this->country->reduceArmies(numOfAttackers);
+    int numOfAttackers = this->country->reduceArmies(this->numAttackingArmies); // could be modified to another value
+    this->country->resetAdvancing();
 
     if (defenders != 0) {
 
@@ -113,28 +113,42 @@ void AttackingOrder::attack() {
             if (randomAssault < 60) {
                 // defenders are killed
                 defenders--;
+                if (defenders == 0) {
+                    break;
+                }
             }
         }
 
         for (int i = 0; i < this->attacking->getArmiesOnTerritory(); i++) {
             int randomDefence = rand() % 100; // generate a number betweem 0 - 100
+            // all attackers have been killed
+            if (numOfAttackers == 0) {
+                break;
+            }
             if (randomDefence < 70) {
                 // attackers are killed
                 numOfAttackers--;
+                
             }
         }
 
         
     }
 
+
+
     int attackingLossed = this->numAttackingArmies - numOfAttackers;
     int defendingLossed = this->attacking->getArmiesOnTerritory() - defenders;
     this->player->sustainedLosses(attackingLossed);
+    cout << "Player " + to_string(this->player->getPlayerId()) + " attacked " + this->attacking->getTerritoryName() + "(" + to_string(this->attacking->getCountryId()) + ") from " + this->country->getTerritoryName() + "(" + to_string(this->country->getCountryId()) + ")" << endl;
+    cout << "   Start: " << to_string(this->numAttackingArmies) + " v " << to_string(this->attacking->getArmiesOnTerritory()) << endl;
+    cout << "   Outcome: " + to_string(numOfAttackers) + " v " + to_string(defenders) << endl;
 
-    if (defenders == 0) { // if all the defenders are vanquished
+    if (defenders == 0 && numOfAttackers > 0) { 
+        // if all the defenders are vanquished
+        // attackers conquered
         this->conquered = true;
         this->player->declareOwner(this->attacking->getTerritoryName()); // lets the map know that the player has now another territory
-        this->player->conquerOpponent(this->attacking->getPlayerOwnership(), defendingLossed, this->attacking->getTerritoryName());
         this->attacking->setArmiesOnTerritory(numOfAttackers);
         /*
         * 
@@ -143,10 +157,22 @@ void AttackingOrder::attack() {
         * 
         */
     }
-    else {
-        this->player->sustainOpponentLosses(this->attacking->getPlayerOwnership(), defendingLossed);
-        this->country->deployArmies(numOfAttackers);
+    else if (numOfAttackers == 0 && defenders == 0) {
+        // stalemate
+        // reflect opponent losses
+        this->attacking->sustainOpponentLosses(defendingLossed);
         this->attacking->reduceArmies(defendingLossed);
+    }
+    else if (defenders > 0 && numOfAttackers == 0) {
+        // attack repelled
+        // reflect opponent losses
+        this->attacking->sustainOpponentLosses(defendingLossed);
+        this->attacking->reduceArmies(defendingLossed);
+    }
+    else {
+        //this->attacking->sustainOpponentLosses(defendingLossed);
+        this->attacking->reduceArmies(defendingLossed);
+        this->country->deployArmies(numOfAttackers);
     }
 }
 
@@ -323,7 +349,7 @@ void Blockade::execute() {
 
        territoryTarget->setArmiesOnTerritory(doubleArmy); // set the number of armies to double the initial number
        int neutralID = -1 ;
-       territoryTarget->setPlayerOwnership(neutralID); // sets the owner's id to the neutral id (kind of , could be modified)
+       territoryTarget->setPlayerOwnership(nullptr); // sets the owner's id to the neutral id (kind of , could be modified)
 
    }
 

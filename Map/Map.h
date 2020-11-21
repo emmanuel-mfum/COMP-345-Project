@@ -5,7 +5,7 @@
 #include <map>
 
 #include "../Observer/Observer.h"
-
+#include "../Player/player.h"
 
 using namespace std;
 /**
@@ -19,6 +19,7 @@ class MapEdge;
 class Continent;
 class Country;
 class GameStatsObserver;
+class Player;
 
 
 enum class TerritoryType {
@@ -148,7 +149,7 @@ public:
 	friend ostream& operator<<(ostream& out, const Country& toOut);
 
 	void setParent(Continent* parent);
-	void setPlayerOwnership(int playerId);
+	void setPlayerOwnership(Player* player);
 	string getContinentParentName();
 	int getPlayerOwnership();
 	void setArmiesOnTerritory(int a);
@@ -157,13 +158,20 @@ public:
 	int getParentId();
 	int getParentBonus();
 	void deployArmies(int numDeploying);
-	void reduceArmies(int numLeavingToAttack);
+	int reduceArmies(int numLeavingToAttack);
+
+	int getCountryId() { return this->territoryId; }
+	void sustainOpponentLosses(int numLost);
+	void setArmiesAdvancingDuringRound(int advancing) { this->armiesAdvancingDuringRound = advancing; }
+	void resetAdvancing() { this->armiesAdvancingDuringRound = 0; }
+	int getAdvancing() { return this->armiesAdvancingDuringRound; }
 
 private:
 	Continent* parent;
+	Player* owner;
 	int playerId;
 	int armies;
-
+	int armiesAdvancingDuringRound;
 };
 
 
@@ -198,7 +206,7 @@ public:
 	void addContinentByReference(Continent* continent);
 	bool edgeExists(MapComponent* territoryOne, MapComponent* territoryTwo);
 	bool validate();
-	Country* setPlayerOwnership(int playerId, string territoryName);
+	Country* setPlayerOwnership(Player* player, string territoryName);
 	vector<Country*> getCountries();
 	int getNumContinents();
 	int getNumCountries();

@@ -32,7 +32,6 @@ private:
     static int playerCounter;
     static int getAndUpdateIdForNew();
     void deployReinforcements();
-    void addToDeployments(int territoryIdx, int numToDeploy);
     void sendToBattle(int territoryIdx, int numSlaughtering);
 
 public:
@@ -63,11 +62,16 @@ public:
     void declareOwner(string countryName);
     void sustainedLosses(int numLossed);
     void wasConquered(int numLossed, string territoryName);
-    void sustainOpponentLosses(int playerId, int numLossed);
+    void sustainOpponentLosses(int playerId, int numLossed, string territoryName);
     void conquerOpponent(int playerId, int numLossed, string territoryName);
     void clearOrders();
+    void addToDeployments(int territoryIdx, int numToDeploy);
+    void cleanDeploymentMap();
+    void lostCountry(Country* lost);
+    void validateDeployments();
 
     // need to implement a setter method
     static void setMap(Map* worldMap);
     static void setPlayersInGame(vector<Player*>* playersInGame);
+    
 };

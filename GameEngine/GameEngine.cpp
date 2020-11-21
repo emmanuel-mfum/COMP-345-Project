@@ -340,7 +340,6 @@ void GameEngine::executeOrdersPhase(){
         vector<queue<Order*>> playerOrders;
         for (Player* player : this->playerOrder) {
             playerOrders.push_back(player->getSortedQueue());
-            player->clearOrders();
         }
 
         vector<bool> deploysFinished;
@@ -375,12 +374,16 @@ void GameEngine::executeOrdersPhase(){
             }
             roundRobinIdx = (roundRobinIdx + 1) % playerOrders.size();
         }
+
+        for (Player* p : this->playerOrder) {
+            p->validateDeployments();
+        }
         roundRobinIdx = 0;
         // consume all remaining orders
         while (true) {
             if (playerOrders[roundRobinIdx].size() > 0) {
-                Order* deployOrder = playerOrders[roundRobinIdx].front();
-                deployOrder->execute();
+                Order* order = playerOrders[roundRobinIdx].front();
+                order->execute();
                 playerOrders[roundRobinIdx].pop();
             }
             bool breakNeeded = true;
@@ -395,12 +398,19 @@ void GameEngine::executeOrdersPhase(){
             }
             roundRobinIdx = (roundRobinIdx + 1) % playerOrders.size();
         }
+
+        for (Player* player : this->playerOrder) {
+            player->cleanDeploymentMap();
+            player->clearOrders();
+        }
         
         this->startPlayerExecute = true;
     }
 }
 
 void GameEngine::mainGameLoop() {
+    srand(time(0));
+
     bool gameover = false;
 
     while (!gameover) {

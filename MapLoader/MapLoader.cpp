@@ -152,6 +152,14 @@ Map* MapLoader::load_map(string fName) {
 					line.erase(0, pos + delimiter.length());
 					borderCounter++;
 				}
+				try {
+					cout << "Connected: " << countryName << " --> " << countries->at(stoi(line) - 1) << endl;
+					map->addEdgeByName(countryName, countries->at(stoi(line) - 1));
+				}
+				catch (const exception& e) {
+					cout << e.what() << endl;
+				}
+
 			}
 		}
 		counter++;
