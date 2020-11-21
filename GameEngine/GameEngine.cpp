@@ -404,10 +404,15 @@ void GameEngine::mainGameLoop() {
     bool gameover = false;
 
     while (!gameover) {
-        gameover = true;
         this->reinforcementPhase();
         this->issueOrdersPhase();
         this->executeOrdersPhase();
-        //Still coding
+
+        
+        for (Player* player : this->playerOrder) {
+            if (player->toDefend().size() == this->map->getNumCountries()) {
+                gameover = true;
+            }
+        }
     }
 }
