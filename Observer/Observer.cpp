@@ -9,6 +9,7 @@
 
 #include "Observer.h"
 #include "../Map/Map.h"
+#include "../Order/Orders.h"
 
 
 using namespace std;
@@ -103,10 +104,30 @@ void GameStatsObserver::registerMap(Map* gameMap) {
 PhaseObserver::PhaseObserver(GameEngine* engine) {
 	this->engine = engine;
 	this->currentEnginePhase = Phases::NIL;
+	this->roundOrders;
+	this->roundOrderInfo;
 }
 
 PhaseObserver::~PhaseObserver() {
 	this->engine = nullptr;
+}
+
+void PhaseObserver::addExecutedOrder(Order* order) {
+	if (order != nullptr) {
+		if (this->roundOrderInfo.find(order->getPlayer()->getPlayerId()) == this->roundOrderInfo.end()) {
+			this->roundOrderInfo.insert(pair<int, map<string, int>>(order->getPlayer()->getPlayerId(), map<string, int>()));
+		}
+		if (this->roundOrderInfo[order->getPlayer()->getPlayerId()].find(order->getType()) == this->roundOrderInfo[order->getPlayer()->getPlayerId()].end()) {
+			this->roundOrderInfo[order->getPlayer()->getPlayerId()].insert(pair<string, int>(order->getType(), 0));
+		}
+
+		this->roundOrderInfo[order->getPlayer()->getPlayerId()][order->getType()] += order->getNum();
+
+		this->roundOrders.push_back(order->getStringDescription());
+	}
+	else {
+		this->roundOrders.push_back("\n\n");
+	}
 }
 
 void PhaseObserver::update() {
@@ -130,7 +151,45 @@ void PhaseObserver::update() {
 				cout << "\nPhaseObserver: Player " << this->engine->getPlayerAtCurIdx() << " starting to execute orders...\n" << endl;
 			}
 			else {
-				cout << "\nPhaseObserver: Player " << this->engine->getPlayerAtCurIdx() << " executing `An Order`\n" << endl;
+				cout << "\n================================================================================" << endl;
+				cout << "vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv\n" << endl;
+				cout << "PhaseObserver:: ORDERS EXECUTED\n\n" << endl;
+
+				cout << "   Orders in played order::\n\n" << endl;
+				for (string orderString : this->roundOrders) {
+					cout << orderString << endl;
+				}
+
+				cout << "\n\n   Overview by player::\n\n" << endl;
+
+				for (auto itr = this->roundOrderInfo.begin(); itr != this->roundOrderInfo.end(); ++itr) {
+					cout << "      Player " + to_string(itr->first) + ":" << endl;
+					for (auto ordItr = itr->second.begin(); ordItr != itr->second.end(); ++ordItr) {
+						if (ordItr->first.compare("Deploy") == 0) {
+							cout << "        Deployed " + to_string(ordItr->second) + " armies" << endl;
+						}
+						else if (ordItr->first.compare("Advance") == 0) {
+							cout << "        Advanced " + to_string(ordItr->second) + " armies" << endl;
+						}
+						else if (ordItr->first.compare("Bomb") == 0) {
+							cout << "        Bombed opponent Player " + to_string(ordItr->second) << endl;
+						}
+						else if (ordItr->first.compare("Blockade") == 0) {
+							cout << "        Performed blockade, resulting in " + to_string(ordItr->second) + " free armies" << endl;
+						}
+						else if (ordItr->first.compare("Negotiate") == 0) {
+							cout << "        Engaged in diplomacy with Player " + to_string(ordItr->second) << endl;
+						}
+						else {
+							cout << "        Airlifted " + to_string(ordItr->second) + " armies" << endl;
+						}
+					}
+				}
+
+				cout << "\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^" << endl;
+				cout << "================================================================================\n" << endl;
+				this->roundOrderInfo.clear();
+				this->roundOrders.clear();
 			}
 		}
 	}

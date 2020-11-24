@@ -3,14 +3,23 @@
 #include "Orders.h"
 #include "../Player/player.h"
 #include "../Map/Map.h"
+#include "../Card/Cards.h"
 #include <iterator>
 #include <algorithm>
 #include <queue>
 
 using namespace std;
 
+
+Deck* Order::gameDeck = nullptr;
+
+
 OrdersList::OrdersList(){
     this->orders_;
+}
+
+void Order::setDeck(Deck* gameDeck) {
+    Order::gameDeck = gameDeck;
 }
 
 Order::Order() {
@@ -71,6 +80,10 @@ Country* Order::getCountry() {
     return this->country;
 }
 
+bool Order::wasSuccess() {
+    return !this->failed;
+}
+
 AttackingOrder::AttackingOrder() : Order() {
     this->attacking = nullptr;
     this->numAttackingArmies = 0;
@@ -99,6 +112,10 @@ AttackingOrder::~AttackingOrder() {}
 
 void AttackingOrder::attack() {
     // TODO CHECK FOR BLOCK!
+    if (this->attacking->getPlayerOwnership() != -1 && this->attacking->diplomaticallyBlocked(this->player->getPlayerId())) {
+        this->failed = true;
+        return;
+    }
 
     this->wasAttack = true;
     int defenders = this->attacking->getArmiesOnTerritory(); // army defending the territory
@@ -140,9 +157,8 @@ void AttackingOrder::attack() {
     int attackingLossed = this->numAttackingArmies - numOfAttackers;
     int defendingLossed = this->attacking->getArmiesOnTerritory() - defenders;
     this->player->sustainedLosses(attackingLossed);
-    cout << "Player " + to_string(this->player->getPlayerId()) + " attacked " + this->attacking->getTerritoryName() + "(" + to_string(this->attacking->getCountryId()) + ") from " + this->country->getTerritoryName() + "(" + to_string(this->country->getCountryId()) + ")" << endl;
-    cout << "   Start: " << to_string(this->numAttackingArmies) + " v " << to_string(this->attacking->getArmiesOnTerritory()) << endl;
-    cout << "   Outcome: " + to_string(numOfAttackers) + " v " + to_string(defenders) << endl;
+    this->survivingAttackers = numOfAttackers;
+    this->survivingDefenders = defenders;
 
     if (defenders == 0 && numOfAttackers > 0) { 
         // if all the defenders are vanquished
@@ -150,12 +166,12 @@ void AttackingOrder::attack() {
         this->conquered = true;
         this->player->declareOwner(this->attacking->getTerritoryName()); // lets the map know that the player has now another territory
         this->attacking->setArmiesOnTerritory(numOfAttackers);
-        /*
-        * 
-        * TODO DRAW A CARD!
-        * 
-        * 
-        */
+        
+        // DRAW A CARD
+        Card* card = Order::gameDeck->draw();
+        if (card != nullptr) {
+            this->player->addCard(card);
+        }
     }
     else if (numOfAttackers == 0 && defenders == 0) {
         // stalemate
@@ -174,6 +190,26 @@ void AttackingOrder::attack() {
         this->attacking->reduceArmies(defendingLossed);
         this->country->deployArmies(numOfAttackers);
     }
+}
+
+int AttackingOrder::getNum() {
+    return this->numAttackingArmies;
+}
+
+string AttackingOrder::getStringDescription() {
+    string returning;
+    if (this->failed) {
+        returning = "      " + this->getType() + " - Player " + to_string(this->player->getPlayerId()) + "'s attack on " + this->attacking->getTerritoryName() + "(" + to_string(this->attacking->getCountryId()) + ") from " + this->country->getTerritoryName() + "(" + to_string(this->country->getCountryId()) + ") FAILED";
+    }
+    else if (this->wasAttack) {
+        returning = "      " + this->getType() + " - Player " + to_string(this->player->getPlayerId()) + " attacked " + this->attacking->getTerritoryName() + "(" + to_string(this->attacking->getCountryId()) + ") from " + this->country->getTerritoryName() + "(" + to_string(this->country->getCountryId()) + ")" + "\n";
+        returning += "         Start: " + to_string(this->numAttackingArmies) + " v " + to_string(this->attacking->getArmiesOnTerritory()) + "\n";
+        returning += "         Outcome: " + to_string(this->survivingAttackers) + " v " + to_string(this->survivingDefenders);
+    }
+    else {
+        returning = "      " + this->getType() + " - Player " + to_string(this->player->getPlayerId()) + " deployed " + to_string(this->numAttackingArmies) + " to " + this->attacking->getTerritoryName() + "(" + to_string(this->attacking->getCountryId()) + ") from " + this->country->getTerritoryName() + "(" + to_string(this->country->getCountryId()) + ")";
+    }
+    return returning;
 }
 
 
@@ -199,15 +235,17 @@ void  Deploy::execute() {
         this->country->deployArmies(this->deploying);
     }
     else {
-        this->failed = false;
-    }
- 
-    
+        this->failed = true;
+    }    
 }
 
 bool Deploy::validate() {
     return this->player->getPlayerId() == this->country->getPlayerOwnership();
     
+}
+
+string Deploy::getStringDescription() {
+    return "      Deploy - Player " + to_string(this->player->getPlayerId()) + " deployed " + to_string(this->deploying) + " to " + this->country->getTerritoryName() + "(" + to_string(this->country->getCountryId()) + ")";
 }
 
 //Advance::Advance(){}
@@ -283,25 +321,21 @@ bool Bomb::validate() {
 
 void Bomb::execute() {
     bool validity = this->validate(); // checks if order is valid 
-    if (validity) { // this implies that the territory belongs to the enemy
-
-        vector <Country*>adjacent = this->player->toAttack(); // gets a vector of potential territories to attack
-        int random = rand() % adjacent.size(); // generate a random number between 0 and the size of the vector
-        Country* territoryTarget = adjacent[random];
-
-         int victims = territoryTarget->getArmiesOnTerritory(); // number of armies on target territory
-
-         int survivors = victims / 2; // number of armies halved by the bombing
-
-         territoryTarget->setArmiesOnTerritory(survivors); // set the new number of armies on the bombed territory
-
+    if (validity) { // this implies that the territory belongs to the ene
+        this->country->bomb();
 
     }
     else {
-        cout << "The order is invalid " << endl;
+        this->failed = true;
     }
+}
 
+int Bomb::getNum() {
+    return this->country->getPlayerOwnership();
+}
 
+string Bomb::getStringDescription() {
+    return "      BOMB - Player " + to_string(this->player->getPlayerId()) + " bombed " + this->country->getTerritoryName() + "(" + to_string(this->country->getCountryId()) + "), reducing number of armies to " + to_string(this->country->getArmiesOnTerritory());
 }
 
 
@@ -318,7 +352,7 @@ bool Blockade::validate() {
 
     vector <Country*>adjacent = this->player->toDefend(); // gets a vector of potential territories to defend (his own)
     int playerID = this->player->getPlayerId(); // takes the player id
-    bool target;
+    bool target = true;
 
     for (int i = 0; i < adjacent.size(); i++) {
 
@@ -331,38 +365,38 @@ bool Blockade::validate() {
     }
 
     return target;
-
-
 }
+
+
 
 void Blockade::execute() {
    bool validity =  this->validate(); // checks validity
 
    if (validity) {
-
-       vector <Country*>adjacent = this->player->toDefend(); // gets a vector of potential territories to defend
-       int random = rand() % adjacent.size(); // generate a random number between 0 and the size of the vector
-       Country* territoryTarget = adjacent[random]; // gets a random territory 
-
-       int intialArmy = territoryTarget->getArmiesOnTerritory(); // gets the number of armies already present on the territory
-       int doubleArmy = intialArmy * 2; // doubles the army size
-
-       territoryTarget->setArmiesOnTerritory(doubleArmy); // set the number of armies to double the initial number
-       int neutralID = -1 ;
-       territoryTarget->setPlayerOwnership(nullptr); // sets the owner's id to the neutral id (kind of , could be modified)
-
+       this->country->blockade();
+   }
+   else {
+       this->failed = true;
    }
 
 }
 
+int Blockade::getNum() {
+    return this->country->getArmiesOnTerritory();
+}
 
-Airlift::Airlift(){}
+string Blockade::getStringDescription() {
+    return "      Blockade - Player " + to_string(this->player->getPlayerId()) + " blockaded " + this->country->getTerritoryName() + "(" + to_string(this->country->getCountryId()) + "), making it neutral and increasing number of armies to " + to_string(this->country->getArmiesOnTerritory());
+}
+
+
+Airlift::Airlift() : AttackingOrder() {}
 
 Airlift::~Airlift(){}
 
-Airlift::Airlift(Player* player, Country* country) : Order("Airlift", player, country, 2) { }
+Airlift::Airlift(Player* player, Country* country, Country* airliftingTo, int numArmies) : AttackingOrder("Airlift", player, country, 2, airliftingTo, numArmies) { }
 
-Airlift::Airlift(const Airlift& other) : Order(other) { }
+Airlift::Airlift(const Airlift& other) : AttackingOrder(other) { }
 
 bool Airlift::validate() {
 
@@ -389,70 +423,16 @@ void Airlift::execute() {
 
 
     if (validity) {
-        vector <Country*> targetTerritories = this->player->toDefend(); // makes a vector pointing at all territories owned by the player
-        //currentPlayer->nextImpendingAttack = this; // try to use Paul's advice here
-        int currentArmies = this->player->getArmies();
-        int attackingArmies = currentArmies -1 ; // random calculation
-        /*
-        *Not sure about this part, the PDF says to look at the advance order for the move of armies
-        *
-        */
-
-        int random = rand() % targetTerritories.size(); // generate a random number
-
-        Country* nearby = targetTerritories[random]; // takes random adjacent territory
-
-        int ownership = nearby->getPlayerOwnership();
-        int id = this->player->getPlayerId();
-
-        if (ownership != id) { // checks if we have to simulate an attack
-
-            int defenders = nearby->getArmiesOnTerritory(); // army defending the territory
-            int survivingDefenders = 0;
-            int numOfAttackers = attackingArmies; // could be modified to another value 
-
-            for (int i = 0; i < numOfAttackers; i++) { // for each attacking army
-                // every attacker tries to kill a defender
-                int randomAssault = rand() % 100; // generate a number between 0 - 100
-                int randomDefence = rand() % 100; // generate a number betweem 0 - 100
-                if (randomAssault < 60) {
-                    // defenders are killed
-                    defenders--;
-                }
-
-                if (randomDefence < 70) {
-                    // attackers are killed
-                    numOfAttackers--;
-                }
-
-
-            }
-
-            if (defenders == 0) { // if all the defenders are vainquished
-                string conquest = nearby->getTerritoryName();
-                this->player->declareOwner(conquest); // lets the map know that the player has now another territory
-                nearby->setArmiesOnTerritory(1); // bring armies on that territory, here I just move one army
-                //totalArmies--; // decrement the number of armies of the player
-                this->player->setArmies(numOfAttackers); // sets it to a new value for the current Player
-
-                // Moreover player should get a Card, but how ? Does the Player has a vector of Cards somewhere
-            }
-
-
-            this->nextImpendingAttack = nullptr; // Here it means the attack is done and finished
-
+        if (this->attacking->getPlayerOwnership() != this->country->getPlayerOwnership()) { // checks if we have to simulate an attack
+            this->attack();
         }
         else {
-
-            nearby->setArmiesOnTerritory(1); // bring armies on that territory, here I just move one army
-            currentArmies--; // decrement the number of armies of the player
-            this->player->setArmies(currentArmies); // sets it to a new value for the current Player
-
+            this->country->deployArmies(this->numAttackingArmies);
         }
     }
 
     else {
-        cout << "Order is invalid" << endl;
+        this->failed = true;
     }
 
 
@@ -462,13 +442,16 @@ void Airlift::execute() {
 
 Negotiate::~Negotiate(){}
 
-Negotiate::Negotiate(Player* player, Country* country) : Order("Negotiate" , player, country, 4) { }
+Negotiate::Negotiate(Player* player, Country* country, Country* attackingCountry) : Order("Negotiate" , player, country, 4) {
+
+    this->attackingCountry = attackingCountry;
+}
 
 Negotiate::Negotiate(const Negotiate& other) : Order(other) {}
 
 
 bool Negotiate::validate() {
-    bool valid;
+    bool valid = true;
    
     int playerID = this->player->getPlayerId();
     vector<Country*> targetTerritories = this->player->toAttack(); // gets all the territories that the player can attack
@@ -476,10 +459,7 @@ bool Negotiate::validate() {
     for (int i = 0; i < targetTerritories.size(); i++) {
         int otherPlayerID = targetTerritories[i]->getPlayerOwnership();
 
-        if (playerID != otherPlayerID) { // checks if the ids are different
-            valid = true;
-        }
-        else { // if for one territory the owner is the same as the player the order is invalid
+        if (playerID == otherPlayerID) { // checks if the ids are different
             valid = false;
             break;
         }
@@ -493,29 +473,22 @@ void Negotiate::execute() {
     bool validity = this->validate();
 
     if (validity) {
-
-        int playerID = this->player->getPlayerId();
-        vector<Country*> targetTerritories = this->player->toAttack(); // gets all the territories that the player can attack
-        int random = rand() % targetTerritories.size(); // generate random number
-        int otherPlayerID = targetTerritories[random]->getPlayerOwnership(); // gets id of another player
-
-        // How to prevent attacks between the two players ?!
-        Order* incoming = this->nextImpendingAttack; // takes the nextImpendingAttack attribute of the current player
-        Player* sourceAttack = incoming->getPlayer(); //  gets the player that is the source of that attack
-        int playerIdBeingAttacked = sourceAttack->getPlayerId(); // get the id that is p
-
-        if ( playerIdBeingAttacked == this->player->getPlayerId()) { // the player being targeted by the attack is the same as the player playing the negotiate
-
-        }
-
-
-
+        this->attackingCountry->initiateDiplomacy(player->getPlayerId());
+        this->player->initiateDiplomacy(this->attackingCountry->getPlayerOwnership());
     }
     else {
-        cout << " The order is invalid" << endl;
+        this->failed = true;
     }
 
 
+}
+
+int Negotiate::getNum() {
+    return this->attackingCountry->getPlayerOwnership();
+}
+
+string Negotiate::getStringDescription() {
+    return "      Negotiate - Player " + to_string(this->player->getPlayerId()) + " initiated diplomacy with Player " + to_string(this->attackingCountry->getPlayerOwnership()) + ", preventing attacks between them for the rest of the round";
 }
 
 
@@ -562,7 +535,6 @@ unsigned long OrdersList::getSize(){
 }
 
 bool OrdersList::compare(Order* o1, Order* o2) {
-    std::cout << o2->getPriority() << std::endl;
     return o1->getPriority() < o2->getPriority();
 }
 

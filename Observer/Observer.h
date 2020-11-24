@@ -2,10 +2,12 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 
 #include "../Map/Map.h"
 #include "../GameEngine/GameEngine.h"
+#include "../Order/Orders.h"
 
 
 using namespace std;
@@ -16,6 +18,7 @@ class PhaseObserver;
 class GameStatsObserver;
 class GameEngine;
 enum class Phases;
+class Order;
 
 
 class Observer {
@@ -43,9 +46,13 @@ public:
 
 	void update();
 
+	void addExecutedOrder(Order* order);
+
 private:
 	GameEngine* engine;
 	Phases currentEnginePhase;
+	map<int, map<string, int>> roundOrderInfo;
+	vector<string> roundOrders;
 };
 
 

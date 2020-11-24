@@ -36,7 +36,7 @@ Map* MapLoader::load_map(string fName) {
 	
 	vector<string>* continents = new vector<string>;
 	vector<string>* countries = new vector<string>;
-
+	cout << "MAPLOADER:: loading map - " << fName << "\n\n" << endl;
 	string delimiter = " ";
 
 	// Load the continents.
@@ -53,25 +53,25 @@ Map* MapLoader::load_map(string fName) {
 		}
 		else if (line.compare("[continents]") == 0) {
 			// have to start reading continents
-			cout << "READING CONTINENTS\n" << endl;
+			cout << "   READING CONTINENTS\n" << endl;
 			isContinents = true;
 			readSplitToken = true;
 		}
 		else if (line.compare("[countries]") == 0) {
 			// connect all the continents once we have finished reading them all
-			cout << "\n\nCONNECTING CONTINENTS\n" << endl;
+			cout << "\n\n   CONNECTING CONTINENTS\n" << endl;
 			for (int i = 0; i < continents->size() - 1; i++) {
-				cout << "Connected: " << continents->at(i) << " --> " << continents->at(i + 1) << endl;
+				// cout << "Connected: " << continents->at(i) << " --> " << continents->at(i + 1) << endl;
 				map->addEdgeByName(continents->at(i), continents->at(i + 1));
 			}
-			cout << "\n\nREADING CONTINENTS\n" << endl;
+			cout << "\n\n   READING CONTINENTS\n" << endl;
 			// have to start reading countries
 			isContinents = false;
 			isCountries = true;
 			readSplitToken = true;
 		}
 		else if (line.compare("[borders]") == 0) {
-			cout << "\n\nCONNECTING COUNTRIES\n" << endl;
+			cout << "\n\n   CONNECTING COUNTRIES\n" << endl;
 			// have to start reading the borders
 			isCountries = false;
 			isBorders = true;
@@ -92,7 +92,7 @@ Map* MapLoader::load_map(string fName) {
 					if (continentCounter == 0) {
 						continentName = token;
 						map->addContinentByName(continentName);
-						cout << "Created territory: " + continentName << endl;
+						// cout << "Created territory: " + continentName << endl;
 						continents->push_back(continentName);
 					}
 					else if (continentCounter == 1) {
@@ -121,7 +121,7 @@ Map* MapLoader::load_map(string fName) {
 					else if (countryCounter == 2) {
 						string continentName = continents->at(stoi(token) - 1);
 						map->addCountryByName(continentName, countryName);
-						cout << "Created territory: " + countryName << endl;
+						// cout << "Created territory: " + countryName << endl;
 						countries->push_back(countryName);
 					}
 
@@ -145,7 +145,7 @@ Map* MapLoader::load_map(string fName) {
 
 					else {
 						// add an edge
-						cout << "Connected: " << countryName << " --> " << countries->at(stoi(token) - 1) << endl;
+						// cout << "Connected: " << countryName << " --> " << countries->at(stoi(token) - 1) << endl;
 						map->addEdgeByName(countryName, countries->at(stoi(token) - 1));
 					}
 
@@ -153,11 +153,10 @@ Map* MapLoader::load_map(string fName) {
 					borderCounter++;
 				}
 				try {
-					cout << "Connected: " << countryName << " --> " << countries->at(stoi(line) - 1) << endl;
+					// cout << "Connected: " << countryName << " --> " << countries->at(stoi(line) - 1) << endl;
 					map->addEdgeByName(countryName, countries->at(stoi(line) - 1));
 				}
 				catch (const exception& e) {
-					cout << e.what() << endl;
 				}
 
 			}
@@ -168,7 +167,14 @@ Map* MapLoader::load_map(string fName) {
 	input_stream.clear();
 	input_stream.seekg(0, input_stream.beg);
 
-	bool isValid = map->validate();
+	if (map->validate()) {
+		cout << "   Map was valid!!" << endl;
+	}
+	else {
+		cout << "   Map was invalid, aborting. . ." << endl;
+		throw exception("Invalid map");
+	}
+
 	return map;
 }
 

@@ -1,7 +1,23 @@
 #pragma once
 #include <string>
 #include <vector>
+#include "../Order/Orders.h"
+#include "../Player/player.h"
+#include "../Map/Map.h"
+
+
 using namespace std;
+
+
+
+class Order;
+class Bomb;
+class Deploy;
+class Blockade;
+class Airlift;
+class Negotiate;
+class Player;
+class Country;
 
 class Card {
 public: 
@@ -14,8 +30,19 @@ public:
 	void play(); 
 	string print() const;
 	string getType();
+	virtual Order* getOrder() = 0;
+
+	static void setCurrentInfo(Player* player, Country* attacking, Country* currentSource, int numArmies);
+	static void unsetCurrentInfo();
+
 private:
 	string type;
+
+protected:
+	static Player* currentlyPlayer;
+	static Country* currentlyAttacking;
+	static Country* currentSource;
+	static int numArmies;
 };
 
 
@@ -31,7 +58,7 @@ public:
 	void printDeck();
 	void shuffleDeck();
 	void backToDeck(Card* c);
-
+	void returnToDeck(Card* c);
 };
 
 class Hand {
@@ -45,6 +72,9 @@ public:
 	Card* removeFromHand(int index);
 	vector<Card*> getCards();
 	string printHand();
+	Card* getCard();
+	bool hasCards() { return this->cards.size() > 0; }
+
 private:
 	vector<Card*> cards;
 };
@@ -59,7 +89,7 @@ public:
 	friend std::ostream& operator<<(std::ostream& out, const BombCard& toOut); // stream operator overload
 	BombCard& operator =(const BombCard& c); // assignment operator overload
 
-
+	Order* getOrder();
 };
 
 class Reinforcement : public Card {
@@ -71,6 +101,7 @@ public:
 	friend std::ostream& operator<<(std::ostream& out, const Reinforcement& toOut); // stream operator overload
 	Reinforcement& operator =(const Reinforcement& c); // assignment operator overload
 
+	Order* getOrder();
 };
 
 class BlockadeCard : public Card {
@@ -82,6 +113,7 @@ public:
 	friend std::ostream& operator<<(std::ostream& out, const BlockadeCard& toOut); // stream operator overload
 	BlockadeCard& operator =(const BlockadeCard& c); // assignment operator overload
 
+	Order* getOrder();
 };
 
 
@@ -94,6 +126,7 @@ public:
 	friend std::ostream& operator<<(std::ostream& out, const AirliftCard& toOut); // stream operator overload
 	AirliftCard& operator =(const AirliftCard& c); // assignment operator overload
 
+	Order* getOrder();
 };
 
 class Diplomacy : public Card {
@@ -105,4 +138,6 @@ public:
 	friend std::ostream& operator<<(std::ostream& out, const Diplomacy& toOut); // stream operator overload
 	Diplomacy& operator =(const Diplomacy& c); // assignment operator overload
 
+
+	Order* getOrder();
 };

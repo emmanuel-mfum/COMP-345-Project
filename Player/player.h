@@ -14,12 +14,16 @@ class Order;
 class OrdersList;
 class Map;
 class Hand;
+class Card;
+
 
 class Player {
 private:
     // declare a static Map so all players can see it
     static Map* worldMap;
     static vector<Player*>* playersInGame;
+    static Deck* gameDeck;
+
     int playerId;
     int armies;
     int reinforcementPool;
@@ -33,6 +37,8 @@ private:
     static int getAndUpdateIdForNew();
     void deployReinforcements();
     void sendToBattle(int territoryIdx, int numSlaughtering);
+
+    int diplomaticPartner;
 
 public:
     //constructor
@@ -73,5 +79,10 @@ public:
     // need to implement a setter method
     static void setMap(Map* worldMap);
     static void setPlayersInGame(vector<Player*>* playersInGame);
-    
+    static void setDeck(Deck* deck);
+
+    void addCard(Card* card);
+    void initiateDiplomacy(int diplomacyId) { this->diplomaticPartner = diplomacyId; }
+    int getNegotiator() { return this->diplomaticPartner; }
+    void endDiplomaticNegotiations() { this->diplomaticPartner = -1; }
 };

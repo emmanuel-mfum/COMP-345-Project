@@ -8,6 +8,7 @@
 #include <vector>
 #include "../Player/player.h"
 #include "../Map/Map.h"
+#include "../Card/Cards.h"
 #include <queue>
 
 using namespace std;
@@ -15,6 +16,8 @@ using namespace std;
 class Country;
 class Player;
 class OrdersList;
+class Deck;
+
 
 class Order {
 friend std::ostream& operator<<(std::ostream& os, const Order& order);
@@ -30,7 +33,11 @@ public:
     Order* nextImpendingAttack; // not sure about that confusing
     Country* getCountry();
     virtual int getPriority() const;
-    bool succeeded() { return !this->failed; }
+    bool wasSuccess();
+    virtual int getNum() = 0;
+    virtual string getStringDescription() = 0;
+
+    static void setDeck(Deck* gameDeck);
 
 protected:
     int priority_;
@@ -38,6 +45,8 @@ protected:
     Player* player;
     Country* country;
     bool failed;
+
+    static Deck* gameDeck;
 };
 
 
@@ -48,6 +57,8 @@ protected:
     int numAttackingArmies;
     bool conquered;
     bool wasAttack;
+    int survivingAttackers;
+    int survivingDefenders;
 
     void attack();
 
@@ -59,6 +70,8 @@ public:
 
     virtual bool validate() = 0;
     virtual void execute() = 0;
+    int getNum();
+    string getStringDescription();
 };
 
 
@@ -72,6 +85,10 @@ public:
     Deploy(const Deploy& other);
     void execute();
     bool validate();
+
+    int getNum() { return this->deploying; }
+
+    string getStringDescription();
 private:
     int deploying;
 };
@@ -94,6 +111,9 @@ public:
     Bomb(const Bomb& other);
     void execute();
     bool validate();
+
+    int getNum();
+    string getStringDescription();
 };
 
 class Blockade : public Order {
@@ -104,13 +124,16 @@ public:
     Blockade(const Blockade& other);
     void execute();
     bool validate();
+
+    int getNum();
+    string getStringDescription();
 };
 
-class Airlift : public Order {
+class Airlift : public AttackingOrder {
 public:
     Airlift();
     ~Airlift();
-    Airlift(Player* player, Country* country);
+    Airlift(Player* player, Country* country, Country* airliftingTo, int numArmies);
     Airlift(const Airlift& other);
     void execute();
     bool validate();
@@ -119,10 +142,16 @@ public:
 class Negotiate : public Order {
 public:
     ~Negotiate();
-    Negotiate(Player* player, Country* country);
+    Negotiate(Player* player, Country* country, Country* attackingCountry);
     Negotiate(const Negotiate& other);
     void execute();
     bool validate();
+
+    int getNum();
+    string getStringDescription();
+
+private:
+    Country* attackingCountry;
 };
 
 class OrdersList {

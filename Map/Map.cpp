@@ -413,7 +413,33 @@ int Country::reduceArmies(int numLeavingToAttack) {
 }
 
 void Country::sustainOpponentLosses(int numLost) {
-	this->owner->sustainedLosses(numLost);
+	if (this->playerId != -1) {
+		this->owner->sustainedLosses(numLost);
+	}
+}
+
+void Country::blockade() {
+	this->owner->wasConquered(this->armies, this->territoryName);
+	this->owner = nullptr;
+	this->playerId = -1;
+	this->armies *= 2;
+}
+
+void Country::initiateDiplomacy(int diplomacyId) {
+	this->owner->initiateDiplomacy(diplomacyId);
+}
+
+bool Country::diplomaticallyBlocked(int playerId) {
+	return this->owner->getNegotiator() == playerId;
+}
+
+void Country::bomb() {
+	int survivingArmies = this->armies / 2;
+	int bombedArmies = this->armies - survivingArmies;
+	if (this->owner != nullptr) {
+		this->owner->sustainedLosses(bombedArmies);
+	}
+	this->armies = survivingArmies;
 }
 
 
@@ -602,7 +628,7 @@ void Map::addEdgeByName(string territoryNameOne, string territoryNameTwo) {
 			cout << "The territories can't be connected because they are not of the same type!!" << endl;
 		}
 		else if (this->edgeExists(terrOne, terrTwo)) {
-			cout << "The territories were not connected because a connection already exists!!" << endl;
+			// cout << "The territories were not connected because a connection already exists!!" << endl;
 		}
 		else {
 			this->addEdgeByReference(terrOne, terrTwo);
@@ -626,9 +652,6 @@ void Map::addEdgeByReference(MapComponent* territoryOne, MapComponent* territory
 		// connections between continents and countries are in the vertices of the continent
 		// create the edge between the territories
 		MapEdge* edge = new MapEdge(territoryOne, territoryTwo);
-		if (territoryOne->getTerritoryName().compare("Pluto-West") == 0 || territoryTwo->getTerritoryName().compare("Pluto-West") == 0) {
-			cout << "HERE" << endl;
-		}
 		// register the edge
 		this->edges.push_back(edge);
 		territoryOne->addEdge(edge);
@@ -718,9 +741,6 @@ Country* Map::setPlayerOwnership(Player* player, string territoryName) {
 	if (this->territoryExists(territoryName)) {
 		Country* terr = dynamic_cast<Country*>(this->mapTerritories.at(this->findTerritory(territoryName)));
 		terr->setPlayerOwnership(player);
-		if (this->registeredStatsObserver != nullptr) {
-			this->registeredStatsObserver->update();
-		}
 		// return territory if found
 		return terr;
 	}

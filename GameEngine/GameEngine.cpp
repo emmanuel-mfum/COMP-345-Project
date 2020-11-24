@@ -46,7 +46,7 @@ int GameEngine::numberOfPlayers() {
         flag = false;
         cin.clear();
         flag&& cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        cout << "Enter the amount of players (2-5):";
+        cout << "\nEnter the amount of players (2-5): ";
         cin >> numOfPlayer;
 
         if (numOfPlayer < 2 || numOfPlayer > 5) {
@@ -71,7 +71,7 @@ string GameEngine::mapSelection() {
         flag = false;
         cin.clear();
         flag&& cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        cout << "Choose a map according to the map number between 1 and " << mapNumber << " :";
+        cout << "\nChoose a map according to the map number between 1 and " << mapNumber << ": ";
         cin >> choice;
         if (choice < 1 || choice > mapNumber) {
             cout << "Invalid choice, try again.";
@@ -94,17 +94,17 @@ bool GameEngine::ObserverOption(string s) {
         flag = false;
         cin.clear();
         flag&& cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        cout << "Enable the observer for " + s + " , type '1' for on and '0' for off: ";
+        cout << "\nEnable the observer for " + s + " , type '1' for on and '0' for off: ";
         cin >> input;
         flag = !cin.good() || input != 1 && input != 0;
     }
     observer = input == 1;
 
     if (observer == true) {
-        cout <<"\n"+ s + " is set to ON."<< endl;
+        cout <<"\n"+ s + " is set to ON.\n"<< endl;
     }
     if (observer == false) {
-        cout <<"\n"+ s + " is set to OFF."<< endl;
+        cout <<"\n"+ s + " is set to OFF.\n"<< endl;
     }
     return observer;
 }
@@ -181,6 +181,9 @@ void GameEngine::smallGameStart(Map* map, vector<Player*> playerOrder) {
 
 
 void GameEngine::gameStart() {
+     cout << "=========================================================================================\n\n\n" << endl;
+     cout << "****                         WELCOME TO THE WARZONE GAME!                            ****\n\n\n" << endl;
+     cout << "=========================================================================================\n\n\n" << endl;
      //Getting map name
      string map= mapSelection();
      //Getting number of players
@@ -219,6 +222,8 @@ void GameEngine::gameStart() {
      //Initialize new Deck
      this->deck = new Deck();
      this->deck->shuffleDeck();
+     Order::setDeck(this->deck);
+     Player::setDeck(this->deck);
 	
      //Initialize players
      for (int i = 1; i <= numPlayers; i++) {
@@ -229,7 +234,7 @@ void GameEngine::gameStart() {
 }
 
 void GameEngine::startupPhase(){
-   
+    cout << "\n\nINITIATING GAME START-UP PHASE\n\n";
     /*the order of the player is generated randomly*/
     vector<bool> isUsed(this->playerList.size());
     for (int i = 0; i < this->playerList.size(); i++) {
@@ -250,13 +255,16 @@ void GameEngine::startupPhase(){
     else {
         armies = 25;
     }
-
+    cout << "    Players will be given " + to_string(armies) + " armies to start\n" << endl;
+    cout << "\n    Creating random order:\n" << endl;
 	for (int i = 0; i < this->playerList.size(); i++) {
         while (true) {
             int random = (rand()) % this->playerList.size();
             if (isUsed[random] == false) {
+                cout << "      Position " + to_string(i) + ": Player " + to_string(this->playerList[random]->getPlayerId()) << endl;
                 this->playerOrder.push_back(this->playerList.at(random));
                 this->playerOrder.at(i)->setInitialArmySize(armies);
+                this->playerOrder.at(i)->endDiplomaticNegotiations();
                 this->eliminated.push_back(false);
                 isUsed[random] = true;
                 break;
@@ -284,12 +292,14 @@ void GameEngine::startupPhase(){
         ctryIdxAsgned.push_back(false);
     }
 
+    cout << "\n    Assigning territories randomly:\n" << endl;
     int playerIdx = 0;
     for (int i = 0; i < allCountries.size(); i++) {
         while (true) {
             int random = (rand()) % allCountries.size();
             if (ctryIdxAsgned[random] == false) {
                 ctryIdxAsgned[random] = true;
+                cout << "      Territory " + allCountries[random]->getTerritoryName() + " at index " + to_string(random) + " assigned to Player " + to_string(this->playerOrder[playerIdx]->getPlayerId()) << endl;
                 // assign to players in their original order or in their turn order?
                 // assign territory to player
                 this->playerOrder.at(playerIdx)->declareOwner(allCountries.at(random)->getTerritoryName());
@@ -338,85 +348,87 @@ void GameEngine::reinforcementPhase(){
 
 void GameEngine::executeOrdersPhase(){
     this->currentPhase = Phases::ExecuteOrder;
+    this->startPlayerExecute = true;
     this->phaseObs->update();
-    for (int i =0; i < this->playerOrder.size(); i++){
-        this->currentPlayerIdx = i;
-        this->phaseObs->update();
-        this->startPlayerExecute = false;
 
-        vector<queue<Order*>> playerOrders;
-        int idx = 0;
-        for (Player* player : this->playerOrder) {
-            if (!this->eliminated[idx]) {
-                playerOrders.push_back(player->getSortedQueue());
-            }
-            idx++;
+    vector<queue<Order*>> playerOrders;
+    int idx = 0;
+    for (Player* player : this->playerOrder) {
+        if (!this->eliminated[idx]) {
+            playerOrders.push_back(player->getSortedQueue());
         }
-
-        vector<bool> deploysFinished;
-        for (int i = 0; i < this->playerOrder.size(); i++) {
-            deploysFinished.push_back(false);
-        }
-        int roundRobinIdx = 0;
-
-        // consume all deploys in round robin fashion
-        while (true) {
-            if (
-                !deploysFinished[roundRobinIdx] && 
-                playerOrders[roundRobinIdx].size() > 0 && 
-                playerOrders[roundRobinIdx].front()->getType().compare("Deploy") == 0
-            ) {
-                Order* deployOrder = playerOrders[roundRobinIdx].front();
-                deployOrder->execute();
-                playerOrders[roundRobinIdx].pop();
-            }
-            else if (!deploysFinished[roundRobinIdx]) {
-                deploysFinished[roundRobinIdx] = true;
-            }
-            bool breakNeeded = false;
-            for (bool b : deploysFinished) {
-                if (b) {
-                    breakNeeded = true;
-                    break;
-                }
-            }
-            if (breakNeeded) {
-                break;
-            }
-            roundRobinIdx = (roundRobinIdx + 1) % playerOrders.size();
-        }
-
-        for (Player* p : this->playerOrder) {
-            p->validateDeployments();
-        }
-        roundRobinIdx = 0;
-        // consume all remaining orders
-        while (true) {
-            if (playerOrders[roundRobinIdx].size() > 0) {
-                Order* order = playerOrders[roundRobinIdx].front();
-                order->execute();
-                playerOrders[roundRobinIdx].pop();
-            }
-            bool breakNeeded = true;
-            for (auto orderQueue : playerOrders) {
-                if (orderQueue.size() > 0) {
-                    breakNeeded = false;
-                    break;
-                }
-            }
-            if (breakNeeded) {
-                break;
-            }
-            roundRobinIdx = (roundRobinIdx + 1) % playerOrders.size();
-        }
-
-        for (Player* player : this->playerOrder) {
-            player->cleanDeploymentMap();
-            player->clearOrders();
-        }
-        
-        this->startPlayerExecute = true;
+        idx++;
     }
+
+    vector<bool> deploysFinished;
+    for (int i = 0; i < this->playerOrder.size(); i++) {
+        deploysFinished.push_back(false);
+    }
+    int roundRobinIdx = 0;
+
+    // consume all deploys in round robin fashion
+    while (true) {
+        if (
+            !deploysFinished[roundRobinIdx] && 
+            playerOrders[roundRobinIdx].size() > 0 && 
+            playerOrders[roundRobinIdx].front()->getType().compare("Deploy") == 0
+        ) {
+            Order* deployOrder = playerOrders[roundRobinIdx].front();
+            deployOrder->execute();
+            playerOrders[roundRobinIdx].pop();
+            this->phaseObs->addExecutedOrder(deployOrder);
+        }
+        else if (!deploysFinished[roundRobinIdx]) {
+            deploysFinished[roundRobinIdx] = true;
+        }
+        bool breakNeeded = false;
+        for (bool b : deploysFinished) {
+            if (b) {
+                breakNeeded = true;
+                break;
+            }
+        }
+        if (breakNeeded) {
+            break;
+        }
+        roundRobinIdx = (roundRobinIdx + 1) % playerOrders.size();
+    }
+
+    this->phaseObs->addExecutedOrder(nullptr);
+
+    for (Player* p : this->playerOrder) {
+        p->validateDeployments();
+    }
+    roundRobinIdx = 0;
+    // consume all remaining orders
+    while (true) {
+        if (playerOrders[roundRobinIdx].size() > 0) {
+            Order* order = playerOrders[roundRobinIdx].front();
+            order->execute();
+            if (order->wasSuccess()) {
+                this->phaseObs->addExecutedOrder(order);
+            }
+            playerOrders[roundRobinIdx].pop();
+        }
+        bool breakNeeded = true;
+        for (auto orderQueue : playerOrders) {
+            if (orderQueue.size() > 0) {
+                breakNeeded = false;
+                break;
+            }
+        }
+        if (breakNeeded) {
+            break;
+        }
+        roundRobinIdx = (roundRobinIdx + 1) % playerOrders.size();
+    }
+
+    for (Player* player : this->playerOrder) {
+        player->cleanDeploymentMap();
+        player->clearOrders();
+    }
+    this->startPlayerExecute = false;
+    this->phaseObs->update();
 }
 
 void GameEngine::mainGameLoop() {
@@ -429,16 +441,21 @@ void GameEngine::mainGameLoop() {
         this->issueOrdersPhase();
         this->executeOrdersPhase();
 
+        this->gsObs->update();
+
         int counter = 0;
         for (Player* player : this->playerOrder) {
             // check for winner
             if (player->toDefend().size() == this->map->getNumCountries()) {
+
                 gameover = true;
             }
             // check if eliminated
             else if (!this->eliminated[counter] && player->toDefend().size() == 0) {
+                // set eliminated
                 this->eliminated[counter] = true;
             }
+            player->endDiplomaticNegotiations();
             counter++;
         }
     }

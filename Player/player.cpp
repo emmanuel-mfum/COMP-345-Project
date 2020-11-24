@@ -6,6 +6,7 @@
 #include "player.h"
 #include "../Order/Orders.h"
 #include "../Map/Map.h"
+#include "../Card/Cards.h"
 
 #include <queue>
 #include <time.h>
@@ -16,6 +17,7 @@ using namespace std;
 // initialize the static member worldMap to null
 Map* Player::worldMap = nullptr;
 vector<Player*>* Player::playersInGame = nullptr;
+Deck* Player::gameDeck = nullptr;
 
 int Player::playerCounter = 0;
 
@@ -170,16 +172,44 @@ void Player::issueOrder() {
             failCounter++;
         }
     }
-    cout << "Finished orders" << endl;
-    // use at most 1 cards per turn
-    // TODO implement using cards!!!!
+
+    if (this->hand->hasCards()) {
+
+        Country* source = nullptr;
+        Country* attacking = nullptr;
+        int numArmies = 0;
+
+        for (Country* c : this->ownedTerritories) {
+            if (this->deployments.find(c->getCountryId()) != this->deployments.end()) {
+                if (this->deployments[c->getCountryId()] >= 3) {
+                    numArmies = (this->deployments[c->getCountryId()] == 3) ? 3 : (int)this->deployments[c->getCountryId()] / 2;
+                    source = c;
+                    break;
+                }
+            }
+        }
+
+        for (Country* c : attackingTerrs) {
+            if (c->getPlayerOwnership() != this->playerId && c->getPlayerOwnership() != -1) {
+                attacking = c;
+                break;
+            }
+        }
+
+        if (attacking != nullptr && source != nullptr) {
+            Card::setCurrentInfo(this, attacking, source, numArmies);
+
+            Card* card = this->hand->getCard();
+            Player::gameDeck->returnToDeck(card);
+            this->ol->addOrder(card->getOrder());
+
+            Card::unsetCurrentInfo();
+        }
+    }
 }
 
 void Player::validateDeployments() {
     for (Country* c : this->ownedTerritories) {
-        if (c->getArmiesOnTerritory() > 0 && this->deployments[c->getCountryId()] != (c->getArmiesOnTerritory() - c->getAdvancing())) {
-            cout << "ERROR" << endl;
-        }
     }
 }
 
@@ -222,7 +252,6 @@ void Player::cleanDeploymentMap() {
 
 void Player::sustainedLosses(int numLossed) {
     this->armies -= numLossed;
-
 }
 
 void Player::wasConquered(int numLossed, string territoryName) {
@@ -344,6 +373,10 @@ void Player::setPlayersInGame(vector<Player*>* playersInGame) {
     Player::playersInGame = playersInGame;
 }
 
+void Player::setDeck(Deck* deck) {
+    Player::gameDeck = deck;
+}
+
 int Player::numOwnedCountries() {
     return this->ownedTerritories.size();
 }
@@ -359,4 +392,9 @@ void Player::addToReinforcements(int numArmies) {
 
 OrdersList* Player::getList(){
     return ol;
+}
+
+
+void Player::addCard(Card* card) {
+    this->hand->pickCard(card);
 }

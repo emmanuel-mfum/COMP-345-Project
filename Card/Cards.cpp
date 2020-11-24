@@ -6,10 +6,47 @@
 #include <iomanip>
 #include <ctime>
 
+#include "../Order/Orders.h"
+#include "../Player/player.h"
+#include "../Map/Map.h"
 
 using namespace std;
 
 const int number_of_cards = 50; // number of cards in a deck
+
+class Order;
+class Bomb;
+class Deploy;
+class Blockade;
+class Airlift;
+class Negotiate;
+class Player;
+class Country;
+
+
+
+
+Player* Card::currentlyPlayer = nullptr;
+Country* Card::currentlyAttacking = nullptr;
+Country* Card::currentSource = nullptr;
+int Card::numArmies = 0;
+
+
+void Card::setCurrentInfo(Player* player, Country* attacking, Country* currentSource, int numArmies) {
+	Card::currentlyPlayer = player;
+	Card::currentlyAttacking = attacking;
+	Card::currentSource = currentSource;
+	Card::numArmies = numArmies;
+}
+
+void Card::unsetCurrentInfo() {
+	Card::currentlyPlayer = nullptr;
+	Card::currentlyAttacking = nullptr;
+	Card::currentSource = nullptr;
+	Card::numArmies = 0;
+}
+
+
 
 Card::Card() { //default constructor
 
@@ -101,17 +138,15 @@ void Deck::shuffleDeck() { // randomizes the deck
 }
 
 Card* Deck::draw() // draws a card from the deck
-{
-	cout << "The player will draw a card" << endl;
-	 
-	Card* a = cards.back();// stores the card from the back of the deck
-	Card* temp = new Card(*a);
-	cards.pop_back(); // remove the last card (the one just taken)
-	cards.pop_back(); // remove the last card (the one just taken)
-	cout << "The size of the deck is now " << cards.size() << endl; // indicates the remaining numbers of cards in the deck
-	delete a;
-	return temp; // returns the card removed.
-	
+{	
+	if (this->cards.size() > 0) {
+		Card* a = cards[0];// stores the card from the back of the deck
+		cards.erase(cards.begin() + 0); // remove the last card (the one just taken
+		return a;
+	}
+	else {
+		return nullptr;
+	}
 }
 
 void Deck::printDeck() // prints all the cards in the deck
@@ -126,11 +161,14 @@ void Deck::printDeck() // prints all the cards in the deck
 void Deck::backToDeck(Card* c) { // takes a card and inserts it at the start of the deck
 
 	cards.insert(cards.begin(), c);
-	cout << "Element inserted into the deck " << endl;
+}
+
+void Deck::returnToDeck(Card* c) {
+	this->cards.push_back(c);
 }
 
 Hand::Hand() { // default constrcutor
-
+	this->cards;
 };
 
 
@@ -158,6 +196,12 @@ vector<Card*>Hand::getCards() { // return the vector of pointers to Cards
 	cards.erase(cards.begin() + i);
 	cout << "Card removed from hand !" << endl;
 	return b;
+}
+
+ Card* Hand::getCard() {
+	 Card* card = this->cards[0];
+	 cards.erase(cards.begin() + 0);
+	 return card;
 }
 
 
@@ -195,6 +239,10 @@ BombCard::BombCard():Card() { //default constructor
 	 return *this;
  }
 
+ Order* BombCard::getOrder() {
+	 return new Bomb(Card::currentlyPlayer, Card::currentlyAttacking);
+ }
+
  Reinforcement::Reinforcement() :Card() { //default constructor
 
  }
@@ -217,6 +265,10 @@ BombCard::BombCard():Card() { //default constructor
 	 //this->type = c.type;
 
 	 return *this;
+ }
+
+ Order* Reinforcement::getOrder() {
+	 return new Deploy(Card::currentlyPlayer, Card::currentSource, rand() % 100);
  }
 
 
@@ -244,6 +296,10 @@ BombCard::BombCard():Card() { //default constructor
 	 return *this;
  }
 
+ Order* BlockadeCard::getOrder() {
+	 return new Blockade(Card::currentlyPlayer, Card::currentSource);
+ }
+
  AirliftCard::AirliftCard() :Card() { //default constructor
 
  }
@@ -268,6 +324,10 @@ BombCard::BombCard():Card() { //default constructor
 	 return *this;
  }
 
+ Order* AirliftCard::getOrder() {
+	 return new Airlift(Card::currentlyPlayer, Card::currentSource, Card::currentlyAttacking, Card::numArmies);
+ }
+
  Diplomacy::Diplomacy() :Card() { //default constructor
 
  }
@@ -290,6 +350,10 @@ BombCard::BombCard():Card() { //default constructor
 	 //this->type = c.type;
 
 	 return *this;
+ }
+
+ Order* Diplomacy::getOrder() {
+	 return new Negotiate(Card::currentlyPlayer, Card::currentSource, Card::currentlyAttacking);
  }
 
 

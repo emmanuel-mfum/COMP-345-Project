@@ -166,6 +166,11 @@ public:
 	void resetAdvancing() { this->armiesAdvancingDuringRound = 0; }
 	int getAdvancing() { return this->armiesAdvancingDuringRound; }
 
+	void bomb();
+	void blockade();
+	void initiateDiplomacy(int diplomacyId);
+	bool diplomaticallyBlocked(int playerId);
+
 private:
 	Continent* parent;
 	Player* owner;
