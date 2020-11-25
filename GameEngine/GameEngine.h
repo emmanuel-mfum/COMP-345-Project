@@ -39,6 +39,7 @@ private :
 	int currentPlayerIdx;
 	int currentPlayerReinf;
 	vector<bool> eliminated;
+	int currentlyCreatingPlayer;
 	
 	GameStatsObserver* gsObs;
 	PhaseObserver* phaseObs;
@@ -46,6 +47,8 @@ private :
 	static string mapSelection();
 	static int numberOfPlayers();
 	static bool ObserverOption(string s);
+
+	Player* createPlayer();
 
 public:
 	

@@ -83,6 +83,35 @@ string GameEngine::mapSelection() {
     return mapDirectory.at(choice - 1);
 }
 
+
+
+Player* GameEngine::createPlayer() {
+    if (this->currentlyCreatingPlayer == 0) {
+        cout << "\nThe GameEngine will now create the players. For each player, enter the number corresponding";
+        cout << "\n  to the strategy you want to implement for each player.";
+        cout << "\n  The options are as follows:";
+        cout << "\n    1. Human strategy";
+        cout << "\n    2. Benevolent strategy";
+        cout << "\n    3. Neutral strategy";
+        cout << "\n    4. Aggressive strategy";
+        cout << "\n    5. Random strategy";
+        cout << "\n\n" << flush;
+    }
+    cout << "Creating player " + to_string(this->currentlyCreatingPlayer) + "::" << endl;
+    bool validSelection = false;
+    int selection;
+    while (!validSelection) {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout << "  Selection: ";
+        cin >> selection;
+        validSelection = cin.good() && selection > -1 && selection < 6;
+    }
+    this->currentlyCreatingPlayer++;
+
+    return new Player(selection);
+}
+
 bool GameEngine::ObserverOption(string s) {
     int input;
     bool flag = true;
@@ -126,6 +155,7 @@ GameEngine::GameEngine() {
     //map = new Map(); default constructor needed
     deck = new Deck();
     this->eliminated;
+    this->currentlyCreatingPlayer = 0;
 }
 
 //copy constructor
@@ -140,6 +170,7 @@ GameEngine::GameEngine(const GameEngine& gameEngine) {
     this->currentPlayerReinf = gameEngine.currentPlayerReinf;
     this->startPlayerExecute = gameEngine.startPlayerExecute;
     this->eliminated = gameEngine.eliminated;
+    this->currentlyCreatingPlayer = gameEngine.currentlyCreatingPlayer;
 }
 
 //destructor
@@ -227,7 +258,7 @@ void GameEngine::gameStart() {
 	
      //Initialize players
      for (int i = 1; i <= numPlayers; i++) {
-         this->playerList.push_back(new Player());
+         this->playerList.push_back(this->createPlayer());
      }
      
      Player::setPlayersInGame(&this->playerList);
@@ -308,6 +339,8 @@ void GameEngine::startupPhase(){
             }
         }
     }
+
+    this->gsObs->update();
 }
 
 void  GameEngine::issueOrdersPhase(){
@@ -315,9 +348,9 @@ void  GameEngine::issueOrdersPhase(){
     this->phaseObs->update();
     for (int i = 0; i < this->playerOrder.size(); i++) {
         if (!this->eliminated[i]) {
-            this->playerOrder[i]->issueOrder();
             this->currentPlayerIdx = i;
             this->phaseObs->update();
+            this->playerOrder[i]->issueOrder();
         }
     }
 };
@@ -352,18 +385,16 @@ void GameEngine::executeOrdersPhase(){
     this->phaseObs->update();
 
     vector<queue<Order*>> playerOrders;
+    vector<bool> deploysFinished;
     int idx = 0;
     for (Player* player : this->playerOrder) {
         if (!this->eliminated[idx]) {
             playerOrders.push_back(player->getSortedQueue());
+            deploysFinished.push_back(false);
         }
         idx++;
     }
 
-    vector<bool> deploysFinished;
-    for (int i = 0; i < this->playerOrder.size(); i++) {
-        deploysFinished.push_back(false);
-    }
     int roundRobinIdx = 0;
 
     // consume all deploys in round robin fashion
@@ -381,10 +412,10 @@ void GameEngine::executeOrdersPhase(){
         else if (!deploysFinished[roundRobinIdx]) {
             deploysFinished[roundRobinIdx] = true;
         }
-        bool breakNeeded = false;
+        bool breakNeeded = true;
         for (bool b : deploysFinished) {
-            if (b) {
-                breakNeeded = true;
+            if (!b) {
+                breakNeeded = false;
                 break;
             }
         }

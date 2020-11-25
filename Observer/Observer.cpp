@@ -47,10 +47,14 @@ string Observer::formatForOut(float toFormat) {
 */
 GameStatsObserver::GameStatsObserver(): Observer() {
 	this->observedMap = nullptr;
+	this->currentNumPlayers = 0;
+	this->eliminated;
 }
 
 GameStatsObserver::GameStatsObserver(Map* gameMap) : Observer() {
 	this->observedMap = gameMap;
+	this->currentNumPlayers = 0;
+	this->eliminated;
 }
 
 GameStatsObserver::~GameStatsObserver() {
@@ -62,6 +66,8 @@ void GameStatsObserver::update() {
 		return;
 	}
 
+	int numPlayers = 0;
+	int numNeutralCountries = 0;
 	map<int, int> countriesByPlayer;
 	for (Country* country : this->observedMap->getCountries()) {
 		if (country->getPlayerOwnership() != -1) {
@@ -70,6 +76,7 @@ void GameStatsObserver::update() {
 				// not found
 				// new entry
 				countriesByPlayer.insert(pair<int, int>(country->getPlayerOwnership(), 1));
+				numPlayers++;
 			}
 			else {
 				// player exists
@@ -77,18 +84,61 @@ void GameStatsObserver::update() {
 				countriesByPlayer[country->getPlayerOwnership()]++;
 			}
 		}
+		else {
+			numNeutralCountries++;
+		}
 	}
+	int winnerId = 0;
+	int winnerNum = 0;
+	int count = 0;
 
 	cout << "\n======================================================================\n";
 	cout << "Observer: GameStatsObserver";
 	cout << "\n  Continents: " + to_string(this->observedMap->getNumContinents());
 	cout << "\n  Countries: " + to_string(this->observedMap->getNumCountries());
 	cout << "\n";
+	
 	for (map<int, int>::iterator itr = countriesByPlayer.begin(); itr != countriesByPlayer.end(); ++itr) {
 		float playerPct = ((float)(itr->second)) / ((float) this->observedMap->getNumCountries()) * 100;
 		cout << "\n  Player " + to_string(itr->first) + " controls " + this->formatForOut(playerPct) + "%, " + to_string(itr->second) + " of " + to_string(this->observedMap->getNumCountries()) + " countries";
+		count++;
+		winnerId = itr->first;
+		winnerNum = itr->second;
 	}
+
+	if (numNeutralCountries > 0) {
+		cout << "\n\n  There are currently " + to_string(numNeutralCountries) + " neutral countries";
+	}
+
+	int totalPlayers = this->currentNumPlayers + this->eliminated.size();
+
+	if (numPlayers < this->currentNumPlayers ) {
+		int counter = 0;
+		int idx = 0;
+		cout << "\n";
+		while (counter < (currentNumPlayers - numPlayers) && idx < totalPlayers) {
+			if (countriesByPlayer.find(idx) == countriesByPlayer.end()) {
+				for (int i : this->eliminated) {
+					if (i != idx) {
+						cout << "\n  Player " + to_string(idx) + " was eliminated";
+						this->eliminated.push_back(idx);
+						counter++;
+					}
+				}
+			}
+			idx++;
+		}
+	}
+	if (count == 1 && this->observedMap->getNumCountries() == winnerNum) {
+		cout << "\n\n  *****************************************";
+		cout <<   "\n  Player " + to_string(winnerId) + " has won the game!";
+		cout <<   "\n  CONGRATULATIONS!!!";
+		cout <<   "\n  *****************************************\n";
+	}
+
 	cout << "\n======================================================================\n\n" << flush;
+
+	this->currentNumPlayers = numPlayers;
 }
 
 void GameStatsObserver::registerMap(Map* gameMap) {

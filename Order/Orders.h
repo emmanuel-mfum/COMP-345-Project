@@ -59,6 +59,7 @@ protected:
     bool wasAttack;
     int survivingAttackers;
     int survivingDefenders;
+    int initialDefendingArmies;
 
     void attack();
 

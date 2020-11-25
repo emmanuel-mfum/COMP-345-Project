@@ -68,4 +68,6 @@ public:
 
 private:
 	Map* observedMap;
+	int currentNumPlayers;
+	vector<int> eliminated;
 };

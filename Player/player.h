@@ -6,6 +6,7 @@
 #include "../Map/Map.h"
 #include "../Order/Orders.h"
 #include "../Card/Cards.h"
+#include "../PlayerStrategy/PlayerStrategies.h"
 #include <queue>
 
 using namespace std;
@@ -18,6 +19,11 @@ class Card;
 
 
 class Player {
+friend class PlayerStrategy;
+friend class BenevolentPlayerStrategy;
+friend class AggressivePlayerStrategy;
+friend class HumanPlayerStrategy;
+
 private:
     // declare a static Map so all players can see it
     static Map* worldMap;
@@ -39,10 +45,13 @@ private:
     void sendToBattle(int territoryIdx, int numSlaughtering);
 
     int diplomaticPartner;
+    PlayerStrategy* strategy;
 
 public:
     //constructor
     Player();
+
+    Player(int strategyNum);
     //destructor
     ~Player();
     //copy constructor

@@ -29,6 +29,35 @@ Player::Player(){
     this->ol = new OrdersList();
     this->hand = new Hand();
     this->deployments;
+    this->strategy = new PlayerStrategy(this);
+}
+
+Player::Player(int strategyNum) {
+    this->armies = 0;
+    this->reinforcementPool = 0;
+    this->playerId = Player::getAndUpdateIdForNew();
+    this->ownedTerritories;
+    this->ol = new OrdersList();
+    this->hand = new Hand();
+    this->deployments;
+    
+    switch (strategyNum) {
+    case 1:
+        this->strategy = new HumanPlayerStrategy(this);
+        break;
+    case 2:
+        this->strategy = new BenevolentPlayerStrategy(this);
+        break;
+    case 3:
+        this->strategy = new NeutralPlayerStrategy(this);
+        break;
+    case 4:
+        this->strategy = new AggressivePlayerStrategy(this);
+        break;
+    case 5:
+    default:
+        this->strategy = new PlayerStrategy(this);
+    }
 }
 
 Player::Player(const Player& pl) {
@@ -40,7 +69,10 @@ Player::Player(const Player& pl) {
     }
     this->ol = new OrdersList();
     this->hand = new Hand();
+    this->strategy = new PlayerStrategy(this);
 }
+
+
 
 Player::~Player() {}
 
@@ -80,132 +112,15 @@ int Player::getAndUpdateIdForNew() {
 
 // this method can just return the list of territories the player owns!
 vector<Country*> Player::toDefend(){
-   return this->ownedTerritories;
+    return this->strategy->toDefend();
 }
 
 vector<Country*> Player::toAttack(){
-    // build a list of territories
-    vector<Country*> toAttack = vector<Country*>();
-
-    // loop through each owned territory
-    for (int i = 0; i < this->ownedTerritories.size(); i++){
-        // get the adjacent territories to the current owned territory
-        vector<Country*> adjacentTerrs = (dynamic_cast<MapComponent*>(this->ownedTerritories.at(i)))->getAdjacentCountries();
-        // loop through each adjacent territories
-        for (int j = 0; j < adjacentTerrs.size(); j++) {
-            bool found = false;
-            // for each territory that has been added to toAttack
-            for (int k = 0; k < toAttack.size(); k++) {
-                // make sure the current adjacentTerritory is not already in the list
-                if (toAttack.at(k)->getTerritoryName().compare(adjacentTerrs.at(j)->getTerritoryName()) == 0) {
-                    found = true;
-                    break;
-                }
-            }
-            for (int k = 0; k < this->ownedTerritories.size(); k++) {
-                if (adjacentTerrs.at(j)->getTerritoryName().compare(this->ownedTerritories.at(k)->getTerritoryName()) == 0) {
-                    found = true;
-                    break;
-                }
-            }
-            // if the territoryname wasn't found
-            if (!found) {
-                toAttack.push_back(adjacentTerrs.at(j));
-            }
-        }
-    }
-    // return a list of unique adjacent territories to the players territory
-    return toAttack;
+    return this->strategy->toAttack();
 }
 //creates an order object and adds it to the list of orders
 void Player::issueOrder() {
-
-    // issue deploy orders for available reinforcements
-    this->deployReinforcements();
-
-    // issue advance orders
-    vector<Country*> attackingTerrs = this->toAttack();
-    vector<bool> wasDepleted;
-    for (int i = 0; i < this->ownedTerritories.size(); i++) {
-        wasDepleted.push_back(false);
-    }
-
-    rand();
-
-    // attack a random number of territories, must be smaller than the number of attack territories and the number of defenders territories
-    int numToAttack = (rand() % attackingTerrs.size());
-    int i = 0;
-    int failCounter = 0;
-    int initialNumDeployments = this->deployments.size();
-    while (i < initialNumDeployments && i < attackingTerrs.size()) {
-        // for each attack
-        // get a random territory to withdraw troops from, must have troops deployed on it
-        int defendIdx = rand() % this->ownedTerritories.size();
-        if (!wasDepleted[defendIdx] && this->deployments.find(this->ownedTerritories[defendIdx]->getCountryId()) != this->deployments.end()) {
-            wasDepleted[defendIdx] = true;
-            // get number to use for attack, allow = all deployed on territory
-            int useForAttack = rand() % (this->deployments[this->ownedTerritories[defendIdx]->getCountryId()] + 1);
-            // can't advance 0....                try to deploy 3 at least               less than three, deploy that number     good number to use
-            useForAttack = (useForAttack == 0) ? ((this->deployments[this->ownedTerritories[defendIdx]->getCountryId()] > 3) ? 3 : this->deployments[this->ownedTerritories[defendIdx]->getCountryId()]) : useForAttack;
-            Advance* advanceOrder = new Advance(this, this->ownedTerritories[defendIdx], attackingTerrs[i], useForAttack);
-            this->ownedTerritories[defendIdx]->setArmiesAdvancingDuringRound(useForAttack);
-
-            // right now to attack is returning all adjacent territories, including the ones owned by the same player
-            // if the target of the advance is an owned territory, don't let it become the source of an advance
-            // if it was allowed to become source of advance later, then this would create extra armies
-            if (attackingTerrs[i]->getPlayerOwnership() == this->playerId) {
-                for (int j = 0; j < this->ownedTerritories.size(); j++) {
-                    if (this->ownedTerritories[j]->getTerritoryName().compare(attackingTerrs[i]->getTerritoryName()) == 0) {
-                        wasDepleted[j] = true;
-                        break;
-                    }
-                }
-            }
-            this->sendToBattle(this->ownedTerritories[defendIdx]->getCountryId(), useForAttack);
-            this->ol->addOrder(advanceOrder);
-            i++;
-        }
-        else if (failCounter > 50) {
-            break;
-        }
-        else {
-            failCounter++;
-        }
-    }
-
-    if (this->hand->hasCards()) {
-
-        Country* source = nullptr;
-        Country* attacking = nullptr;
-        int numArmies = 0;
-
-        for (Country* c : this->ownedTerritories) {
-            if (this->deployments.find(c->getCountryId()) != this->deployments.end()) {
-                if (this->deployments[c->getCountryId()] >= 3) {
-                    numArmies = (this->deployments[c->getCountryId()] == 3) ? 3 : (int)this->deployments[c->getCountryId()] / 2;
-                    source = c;
-                    break;
-                }
-            }
-        }
-
-        for (Country* c : attackingTerrs) {
-            if (c->getPlayerOwnership() != this->playerId && c->getPlayerOwnership() != -1) {
-                attacking = c;
-                break;
-            }
-        }
-
-        if (attacking != nullptr && source != nullptr) {
-            Card::setCurrentInfo(this, attacking, source, numArmies);
-
-            Card* card = this->hand->getCard();
-            Player::gameDeck->returnToDeck(card);
-            this->ol->addOrder(card->getOrder());
-
-            Card::unsetCurrentInfo();
-        }
-    }
+    this->strategy->issueOrder();
 }
 
 void Player::validateDeployments() {
@@ -247,7 +162,8 @@ void Player::cleanDeploymentMap() {
             this->deployments.insert(pair<int, int>(c->getCountryId(), c->getArmiesOnTerritory()));
         }
     }
-    this->armies = totalArmiesRemaining;
+    
+    this->armies = totalArmiesRemaining + this->reinforcementPool;
 }
 
 void Player::sustainedLosses(int numLossed) {
@@ -327,7 +243,7 @@ void Player::deployReinforcements() {
         Deploy* deployOrder = new Deploy(this, this->toDefend()[defendIdx], deployable);
         this->ol->addOrder(deployOrder);
         this->addToDeployments(this->ownedTerritories[defendIdx]->getCountryId(), deployable);
-        defendIdx++;
+        defendIdx = (defendIdx + 1) % this->ownedTerritories.size();
     }
 }
 
