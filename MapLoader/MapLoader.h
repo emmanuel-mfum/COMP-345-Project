@@ -18,4 +18,15 @@ public:
 	MapLoader(string fName);
 	~MapLoader();
 	static Map* load_map(std::string fName);
+}
+
+class ConquestFileReader
+{
+private:
+	Map* newConquestMap
+public:
+	ConquestFileReader(string fName);
+	~ConquestFileReader();
+	static Map* load_ConquestMap(std::string fName);
 };
+
