@@ -178,3 +178,43 @@ Map* MapLoader::load_map(string fName) {
 	return map;
 }
 
+ConquestFileReaderAdapter::ConquestFileReaderAdapter(MapLoader* maploader)
+{
+	domination = maploader;
+	conquest = NULL;
+}
+
+ConquestFileReaderAdapter::ConquestFileReaderAdapter(ConquestFileReader* conquest)
+{
+	conquest = conquest;
+	domination = NULL;
+}
+
+ConquestFileReaderAdapter::setBool(int input) {
+
+	if (input == 0) {
+
+		this->isDomination = true; // the user wants a domination map
+	
+	}
+	else {
+		this->isDomination = false; // the user wants a conquest map
+	}
+
+}
+
+ConquestFileReaderAdapter::parseMap(string name) {
+
+	if (isDomination) {
+
+		
+		// parse the map as a we did it before
+		this->domination->load_map(name);
+	
+	
+	}
+	else {
+		// use the methods in ConquestFileReader
+		this->conquest// use the load map the of the ConquestFileReader
+	}
+}
