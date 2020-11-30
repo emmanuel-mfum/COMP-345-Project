@@ -30,3 +30,18 @@ public:
 	static Map* load_ConquestMap(std::string fName);
 };
 
+class ConquestFileReaderAdapter : public MapLoader, public ConquestFileReader {
+
+private:
+	MapLoader* domination;
+	ConquestFileReader* conquest;
+	bool isDomination;
+
+public:
+	ConquestFileReaderAdapter(MapLoader* maploader);
+	ConquestFileReaderAdapter(ConquestFileReader* conquest);
+	void setBool(int input);
+	Map* parseMap(string name);
+
+
+};
