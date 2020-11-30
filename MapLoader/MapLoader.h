@@ -28,5 +28,15 @@ public:
 	ConquestFileReader(string fName);
 	~ConquestFileReader();
 	static Map* load_ConquestMap(std::string fName);
+}
+
+class Adpater : public MapLoader
+{
+private:
+	ConquestFileReader* fr;
+public:
+	 Adapter(string fName);
+	~Adapter();
+
 };
 
