@@ -177,6 +177,14 @@ Map* MapLoader::load_map(string fName) {
 
 	return map;
 }
+//parameterized constructor for conquestMap
+ConquestFileReader::ConquestFileReader(string fName) {
+	this->newConquestMap=load_ConquestMap(fName);
+}
+//destructor for conquestMap
+ConquestFileReader::~ConquestFileReader() {
+	delete newConquestMap;
+}
 
 
 Map* ConquestFileReader::load_ConquestMap(string fName) {
@@ -186,9 +194,6 @@ Map* ConquestFileReader::load_ConquestMap(string fName) {
 	std::string line_read;
 
 
-}
-ConquestFileReader::~ConquestFileReader() {
-	
 }
 
 ConquestFileReaderAdapter::ConquestFileReaderAdapter(MapLoader* maploader)
