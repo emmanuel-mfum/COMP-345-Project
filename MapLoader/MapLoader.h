@@ -42,6 +42,8 @@ private:
 public:
 	ConquestFileReaderAdapter(MapLoader* maploader);
 	ConquestFileReaderAdapter(ConquestFileReader* conquest);
+	ConquestFileReaderAdapter(ConquestFileReaderAdapter& mapReader);
+	~ConquestFileReaderAdapter();
 	void setBool(int input);
 	Map* parseMap(string name);
 
