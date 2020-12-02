@@ -203,6 +203,21 @@ ConquestFileReaderAdapter::ConquestFileReaderAdapter(ConquestFileReader* conques
 	domination = NULL;
 }
 
+ConquestFileReaderAdapter::~ConquestFileReaderAdapter(){
+	delete domination;
+	domination = nullptr;
+	delete conquest;
+	conquest = nullptr;
+	delete isDomination;
+
+}
+
+ConquestFileReaderAdapter::ConquestFileReaderAdapter(ConquestFileReaderAdapter& mapReader) {
+	domination = mapReader.domination;
+	conquest = mapReader.conquest;
+	isDomination = mapReader.isDomination;
+}
+
 ConquestFileReaderAdapter::setBool(int input) {
 
 	if (input == 0) {
