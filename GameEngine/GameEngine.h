@@ -44,7 +44,7 @@ private :
 	GameStatsObserver* gsObs;
 	PhaseObserver* phaseObs;
 
-	static string mapSelection();
+	static string mapSelection(int choice);
 	static int numberOfPlayers();
 	static bool ObserverOption(string s);
 
