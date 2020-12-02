@@ -57,30 +57,63 @@ int GameEngine::numberOfPlayers() {
     cout << "\nYou have selected " << numOfPlayer << endl;
     return numOfPlayer;
 }
-string GameEngine::mapSelection() {
-    vector<string> mapDirectory;
-    int mapNumber = 0;
-    for (const auto& mapFromDirectory : fs::directory_iterator(directory)) {
-        mapDirectory.push_back(mapFromDirectory.path().filename().string());
-        cout << "[ Map " << ++mapNumber << "] - Name : " << mapFromDirectory.path().filename();
-        cout << endl;
-    }
-    int choice;
-    bool flag = true;
-    while (flag) {
-        flag = false;
-        cin.clear();
-        flag&& cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        cout << "\nChoose a map according to the map number between 1 and " << mapNumber << ": ";
-        cin >> choice;
-        if (choice < 1 || choice > mapNumber) {
-            cout << "Invalid choice, try again.";
+string GameEngine::mapSelection(int choice) {
+
+    if (choice == 0) {
+
+        vector<string> mapDirectory;
+        int mapNumber = 0;
+        for (const auto& mapFromDirectory : fs::directory_iterator(directory)) {
+            mapDirectory.push_back(mapFromDirectory.path().filename().string());
+            cout << "[ Map " << ++mapNumber << "] - Name : " << mapFromDirectory.path().filename();
             cout << endl;
         }
-        flag = !cin.good() || choice < 1 || choice > mapNumber;
+        int choice;
+        bool flag = true;
+        while (flag) {
+            flag = false;
+            cin.clear();
+            flag&& cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "\nChoose a map according to the map number between 1 and " << mapNumber << ": ";
+            cin >> choice;
+            if (choice < 1 || choice > mapNumber) {
+                cout << "Invalid choice, try again.";
+                cout << endl;
+            }
+            flag = !cin.good() || choice < 1 || choice > mapNumber;
+        }
+        cout << "\nThe map chosen is :" << mapDirectory.at(choice - 1) << endl;
+        return mapDirectory.at(choice - 1);
     }
-    cout << "\nThe map chosen is :" << mapDirectory.at(choice - 1) << endl;
-    return mapDirectory.at(choice - 1);
+    else { // choice == 1
+
+        // perhaps going through the directory should be similar, just need to make sure we are dealing with a different directory than
+        // in the above 
+        vector<string> mapDirectory;
+        int mapNumber = 0;
+        for (const auto& mapFromDirectory : fs::directory_iterator(directory)) {
+            mapDirectory.push_back(mapFromDirectory.path().filename().string());
+            cout << "[ Map " << ++mapNumber << "] - Name : " << mapFromDirectory.path().filename();
+            cout << endl;
+        }
+        int choice;
+        bool flag = true;
+        while (flag) {
+            flag = false;
+            cin.clear();
+            flag&& cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "\nChoose a map according to the map number between 1 and " << mapNumber << ": ";
+            cin >> choice;
+            if (choice < 1 || choice > mapNumber) {
+                cout << "Invalid choice, try again.";
+                cout << endl;
+            }
+            flag = !cin.good() || choice < 1 || choice > mapNumber;
+        }
+        cout << "\nThe map chosen is :" << mapDirectory.at(choice - 1) << endl;
+        return mapDirectory.at(choice - 1);
+
+    }
 }
 
 
@@ -215,8 +248,19 @@ void GameEngine::gameStart() {
      cout << "=========================================================================================\n\n\n" << endl;
      cout << "****                         WELCOME TO THE WARZONE GAME!                            ****\n\n\n" << endl;
      cout << "=========================================================================================\n\n\n" << endl;
+
+     int choice;
+     cout << "Do you want to use a Domination or Conquest Map ? Enter 0 for a domination map, 1 for a conquest map: " << endl;
+     cin >> choice;
+
+     while (choice != 1 || choice != 0) {
+
+         cout << "Do you want to use a Domination or Conquest Map ? Enter 0 for a domination map, 1 for a conquest map: " << endl;
+         cin >> choice;
+     }
+
      //Getting map name
-     string map= mapSelection();
+     string map= mapSelection(choice); // originally mapSelection didn't take any parameters
      //Getting number of players
      int numPlayers=numberOfPlayers();
      //Initialize Phase Observer
@@ -226,7 +270,17 @@ void GameEngine::gameStart() {
 	
      //Initialize map
      try {
-         this->map = MapLoader::load_map(GameEngine::directory + map);
+         //this->map = MapLoader::load_map(GameEngine::directory + map); original line
+         if (choice == 0) {
+
+             ConquestFileReaderAdapter adapter = new ConquestFileReaderAdapter(new MapLoader());
+             adapter->parseMap(map); // will call the approriate method for the MapLoader via the adapter
+         }
+
+         if (choice == 1) {
+             ConquestFileReaderAdapter adapter = new ConquestFileReaderAdapter(new ConquestFileReader());
+             adapter->parseMap(map); // will call the approriate method for the ConquestFileReader via the adapter
+         }
      }
      catch (const exception& e) {
          cout << e.what() << endl;
