@@ -178,6 +178,19 @@ Map* MapLoader::load_map(string fName) {
 	return map;
 }
 
+
+Map* ConquestFileReader::load_ConquestMap(string fName) {
+	Map* conquestmap = nullptr;
+
+	std::ifstream input_stream(fName);
+	std::string line_read;
+
+
+}
+ConquestFileReader::~ConquestFileReader() {
+	
+}
+
 ConquestFileReaderAdapter::ConquestFileReaderAdapter(MapLoader* maploader)
 {
 	domination = maploader;
