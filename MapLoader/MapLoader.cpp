@@ -435,13 +435,13 @@ Map* ConquestFileReaderAdapter::parseMap(string name) {
 
 		
 		// parse the map as a we did it before
-		return this->domination->load_map("C:/Users/lix11/Documents/GitHub/COMP-345-Project/Map_Directory/" + name);
+		return this->domination->load_map("../Map_Directory/" + name);
 	
 	
 	}
 	else {
 		// use the methods in ConquestFileReader
-		return this->conquest->load_ConquestMap("C:/Users/lix11/Documents/GitHub/COMP-345-Project/Map_Directory2/" + name);
+		return this->conquest->load_ConquestMap("../Map_Directory2/" + name);
 	}
 }
 
