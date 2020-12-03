@@ -11,8 +11,12 @@
 using namespace std;
 
 
+MapLoader::MapLoader() {}
+
 //parameterized constructor
+
 MapLoader::MapLoader(string fName) {
+	this->filename = fName;
 	this->newMap = load_map(fName);
 }
 
@@ -177,12 +181,23 @@ Map* MapLoader::load_map(string fName) {
 
 	return map;
 }
+
 //load map for conquest
+
+
+string MapLoader::getFileName()
+{
+	return this->filename;
+}
+
+
+
 Map* ConquestFileReader::load_ConquestMap(string fName) {
 	Map* ConquestMap = nullptr;
 
 	std::ifstream input_stream(fName);
 	std::string line_read;
+
 
 	bool isContinents = false;
 	bool isTerritories = false;
@@ -330,41 +345,78 @@ Map* ConquestFileReader::load_ConquestMap(string fName) {
 //parameterized constructor for conquestMap
 ConquestFileReader::ConquestFileReader(string fName) {
 	this->newConquestMap=load_ConquestMap(fName);
+
 }
+
+ConquestFileReader::ConquestFileReader() {}
+
 //destructor for conquestMap
 ConquestFileReader::~ConquestFileReader() {
 	delete newConquestMap;
 }
 
 
+// default constructor for ConquestFileReaderAdapter
+ConquestFileReaderAdapter::ConquestFileReaderAdapter()
+{
+	
+}
+
+// Parameterized constructor for ConquestFileReaderAdapter
 ConquestFileReaderAdapter::ConquestFileReaderAdapter(MapLoader* maploader)
 {
 	domination = maploader;
 	conquest = NULL;
+	isDomination = true;
 }
 
+// Parameterized constructor for ConquestFileReaderAdapter
 ConquestFileReaderAdapter::ConquestFileReaderAdapter(ConquestFileReader* conquest)
 {
 	conquest = conquest;
 	domination = NULL;
+	isDomination = false;
 }
 
+// destructor for ConquestFileReaderAdapter
 ConquestFileReaderAdapter::~ConquestFileReaderAdapter(){
 	delete domination;
 	domination = nullptr;
 	delete conquest;
 	conquest = nullptr;
-	delete isDomination;
 
 }
 
+// Copy constructor for ConquestFileReaderAdapter
 ConquestFileReaderAdapter::ConquestFileReaderAdapter(ConquestFileReaderAdapter& mapReader) {
 	domination = mapReader.domination;
 	conquest = mapReader.conquest;
 	isDomination = mapReader.isDomination;
 }
 
-ConquestFileReaderAdapter::setBool(int input) {
+// Assignment operator for ConquestFileReaderAdapter
+ConquestFileReaderAdapter& ConquestFileReaderAdapter::operator=(const ConquestFileReaderAdapter& mapR)
+{
+	this->domination = mapR.domination;
+	this->conquest = mapR.conquest;
+	this->isDomination = mapR.isDomination;
+	return *this;
+}
+
+// Stream operator for ConquestFileReaderAdapter
+ostream& operator<<(ostream& out, const ConquestFileReaderAdapter& mapR) {
+	out << "The name of the file currently used: " << endl;
+	if (!mapR.fileName.compare("")) {
+		out << "File doesn't exist !!! " << endl;
+	}
+	else {
+		out << mapR.fileName << endl;
+	}
+	return out;
+}
+
+// setter for isDomination 
+ void ConquestFileReaderAdapter::setBool(int input) {
 
 	if (input == 0) {
 
@@ -376,19 +428,31 @@ ConquestFileReaderAdapter::setBool(int input) {
 	}
 
 }
-
-ConquestFileReaderAdapter::parseMap(string name) {
+ // method to load the map according to the type specified by the user
+Map* ConquestFileReaderAdapter::parseMap(string name) {
 
 	if (isDomination) {
 
 		
 		// parse the map as a we did it before
-		this->domination->load_map(name);
+		return this->domination->load_map("C:/Users/lix11/Documents/GitHub/COMP-345-Project/Map_Directory/" + name);
 	
 	
 	}
 	else {
 		// use the methods in ConquestFileReader
-		this->conquest// use the load map the of the ConquestFileReader
+		return this->conquest->load_ConquestMap("C:/Users/lix11/Documents/GitHub/COMP-345-Project/Map_Directory2/" + name);
 	}
+}
+
+// getter for the file name
+string ConquestFileReaderAdapter::getFileName() {
+
+	return this->fileName;
+}
+
+// setter for the file name
+void ConquestFileReaderAdapter::setFileName(string name) {
+
+	this->fileName = name;
 }
