@@ -21,7 +21,7 @@ MapLoader::~MapLoader() {
 	delete newMap;
 }
 
-
+//load map for domination
 Map* MapLoader::load_map(string fName) {
 	Map* map = nullptr;
 	
@@ -177,6 +177,156 @@ Map* MapLoader::load_map(string fName) {
 
 	return map;
 }
+//load map for conquest
+Map* ConquestFileReader::load_ConquestMap(string fName) {
+	Map* ConquestMap = nullptr;
+
+	std::ifstream input_stream(fName);
+	std::string line_read;
+
+	bool isContinents = false;
+	bool isTerritories = false;
+	bool isBorders = false;
+	bool readSplitToken = false;
+	
+
+	vector<string>* continents = new vector<string>;
+	vector<string>* territories = new vector<string>;
+	cout << "ConquestFileReader::loading ConquestMap " << fName << "\n\n" << endl;
+	string delimiter = " ";
+
+	// Load the continents.
+	int counter = 0;
+	while (getline(input_stream, line_read)) {
+		string line = line_read;
+		readSplitToken = false;
+
+		// assume continents comes first, territories comes after
+		if (counter == 0) {
+			// create a new map with the name
+			string mapName = line.substr(line.find("map: ") + 5);
+			ConquestMap = new Map(mapName);
+		}
+		else if (line.compare("[continents]") == 0) {
+			// have to start reading continents
+			cout << "   READING CONTINENTS\n" << endl;
+			isContinents = true;
+			readSplitToken = true;
+		}
+		else if (line.compare("[territories]") == 0) {
+			// connect all the continents once we have finished reading them all
+			cout << "\n\n   CONNECTING CONTINENTS\n" << endl;
+			for (int i = 0; i < continents->size() - 1; i++) {
+				// cout << "Connected: " << continents->at(i) << " --> " << continents->at(i + 1) << endl;
+				ConquestMap->addEdgeByName(continents->at(i), continents->at(i + 1));
+			}
+			cout << "\n\n   READING CONTINENTS\n" << endl;
+			// have to start reading countries
+			isContinents = false;
+			isTerritories = true;
+			readSplitToken = true;
+		}
+		else if (line.compare("[borders]") == 0) {
+			cout << "\n\n   CONNECTING COUNTRIES\n" << endl;
+			// have to start reading the borders
+			isTerritories = false;
+			isBorders = true;
+			readSplitToken = true;
+		}
+
+		if (!readSplitToken && line.compare("") != 0) {
+			// have to read the component on the line
+			if (isContinents) {
+				// add the country to the map
+				size_t pos = 0;
+				string token;
+				int continentCounter = 0;
+				string continentName;
+				while ((pos = line.find(delimiter)) != string::npos) {
+					token = line.substr(0, pos);
+					// add the continent to the map
+					if (continentCounter == 0) {
+						continentName = token;
+						ConquestMap->addContinentByName(continentName);
+						// cout << "Created territory: " + continentName << endl;
+						continents->push_back(continentName);
+					}
+					else if (continentCounter == 1) {
+						int continentBonus = stoi(token);
+						ConquestMap->setContinentBonus(continentName, continentBonus);
+					}
+
+					line.erase(0, pos + delimiter.length());
+					continentCounter++;
+				}
+			}
+			else if (isTerritories) {
+				// add the country to the map
+				size_t pos = 0;
+				string token;
+				int countryCounter = 0;
+				string countryName;
+				// tokenize the line
+				while ((pos = line.find(delimiter)) != string::npos) {
+					token = line.substr(0, pos);
+					// found the country name
+					if (countryCounter == 1) {
+						countryName = token;
+					}
+					// now know which continent the country belongs to, can be added to map
+					else if (countryCounter == 2) {
+						string continentName = continents->at(stoi(token) - 1);
+						ConquestMap->addCountryByName(continentName, countryName);
+						// cout << "Created territory: " + countryName << endl;
+						territories->push_back(countryName);
+					}
+
+					line.erase(0, pos + delimiter.length());
+					countryCounter++;
+				}
+			}
+			else if (isBorders) {
+				// add the border to the map
+				size_t pos = 0;
+				string token;
+				string countryName;
+				int borderCounter = 0;
+				// tokenize the string
+				while ((pos = line.find(delimiter)) != string::npos) {
+					token = line.substr(0, pos);
+					// found which country the borders are for
+					if (borderCounter == 0) {
+						countryName = territories->at(stoi(token) - 1);
+					}
+
+					else {
+						// add an edge
+						// cout << "Connected: " << countryName << " --> " << countries->at(stoi(token) - 1) << endl;
+						ConquestMap->addEdgeByName(countryName, territories->at(stoi(token) - 1));
+					}
+
+					line.erase(0, pos + delimiter.length());
+					borderCounter++;
+				}
+				try {
+					// cout << "Connected: " << countryName << " --> " << countries->at(stoi(line) - 1) << endl;
+					ConquestMap->addEdgeByName(countryName, territories->at(stoi(line) - 1));
+				}
+				catch (const exception& e) {
+				}
+
+			}
+		}
+		counter++;
+	}
+
+	input_stream.clear();
+	input_stream.seekg(0, input_stream.beg);
+
+	return ConquestMap;
+}
+
+
 //parameterized constructor for conquestMap
 ConquestFileReader::ConquestFileReader(string fName) {
 	this->newConquestMap=load_ConquestMap(fName);
