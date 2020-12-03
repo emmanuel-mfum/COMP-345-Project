@@ -16,7 +16,8 @@ using namespace std;
 class GameEngine;
 
 
-const char* GameEngine::directory = "../Map_Directory/";
+ //string GameEngine::directory = "../Map_Directory/";
+string GameEngine::directory = "C:/Users/lix11/Documents/GitHub/COMP-345-Project/Map_Directory/";
 
 
 ostream& operator<<(ostream& out, Phases e) {
@@ -86,6 +87,9 @@ string GameEngine::mapSelection(int choice) {
         return mapDirectory.at(choice - 1);
     }
     else { // choice == 1
+
+         //GameEngine::directory = "../Map_Directory2";
+         GameEngine::directory = "C:/Users/lix11/Documents/GitHub/COMP-345-Project/Map_Directory2/";
 
         // perhaps going through the directory should be similar, just need to make sure we are dealing with a different directory than
         // in the above 
@@ -253,7 +257,7 @@ void GameEngine::gameStart() {
      cout << "Do you want to use a Domination or Conquest Map ? Enter 0 for a domination map, 1 for a conquest map: " << endl;
      cin >> choice;
 
-     while (choice != 1 || choice != 0) {
+     while (choice != 1 && choice != 0) {
 
          cout << "Do you want to use a Domination or Conquest Map ? Enter 0 for a domination map, 1 for a conquest map: " << endl;
          cin >> choice;
@@ -273,13 +277,13 @@ void GameEngine::gameStart() {
          //this->map = MapLoader::load_map(GameEngine::directory + map); original line
          if (choice == 0) {
 
-             ConquestFileReaderAdapter adapter = new ConquestFileReaderAdapter(new MapLoader());
-             adapter->parseMap(map); // will call the approriate method for the MapLoader via the adapter
+             ConquestFileReaderAdapter* adapter = new ConquestFileReaderAdapter(new MapLoader());
+             this->map = adapter->parseMap(map); // will call the approriate method for the MapLoader via the adapter
          }
 
          if (choice == 1) {
-             ConquestFileReaderAdapter adapter = new ConquestFileReaderAdapter(new ConquestFileReader());
-             adapter->parseMap(map); // will call the approriate method for the ConquestFileReader via the adapter
+             ConquestFileReaderAdapter* adapter = new ConquestFileReaderAdapter(new ConquestFileReader());
+             this->map = adapter->parseMap(map); // will call the approriate method for the ConquestFileReader via the adapter
          }
      }
      catch (const exception& e) {
