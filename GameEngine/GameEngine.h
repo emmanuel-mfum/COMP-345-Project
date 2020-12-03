@@ -52,7 +52,7 @@ private :
 
 public:
 	
-	static const char* directory;
+	static  string directory;
 	GameEngine();
 	GameEngine(const GameEngine& gameEngine);
 	~GameEngine();
