@@ -16,8 +16,8 @@ using namespace std;
 class GameEngine;
 
 
- //string GameEngine::directory = "../Map_Directory/";
-string GameEngine::directory = "C:/Users/lix11/Documents/GitHub/COMP-345-Project/Map_Directory/";
+
+string GameEngine::directory = "../Map_Directory/";
 
 
 ostream& operator<<(ostream& out, Phases e) {
@@ -88,11 +88,10 @@ string GameEngine::mapSelection(int choice) {
     }
     else { // choice == 1
 
-         //GameEngine::directory = "../Map_Directory2";
-         GameEngine::directory = "C:/Users/lix11/Documents/GitHub/COMP-345-Project/Map_Directory2/";
+         
+         GameEngine::directory = "../Map_Directory2/";
 
-        // perhaps going through the directory should be similar, just need to make sure we are dealing with a different directory than
-        // in the above 
+       // going through the second directory
         vector<string> mapDirectory;
         int mapNumber = 0;
         for (const auto& mapFromDirectory : fs::directory_iterator(directory)) {
