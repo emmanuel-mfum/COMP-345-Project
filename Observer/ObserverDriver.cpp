@@ -2,7 +2,10 @@
 #include <vector>
 #include <iostream>
 
-#include "Map.h"
+
+#include "Observer.h"
+#include "../Map/Map.h"
+#include "../GameEngine/GameEngine.h"
 
 
 using namespace std;
@@ -10,7 +13,13 @@ using namespace std;
 
 int main() {
 
+
 	Map* m = new Map("Risk Map");
+
+	GameStatsObserver* gso = new GameStatsObserver();
+
+	m->attachGameStatsObserver(gso);
+	gso->registerMap(m);
 
 	Country* france = new Country("France");
 	Continent* europe = new Continent("Europe");
@@ -69,26 +78,28 @@ int main() {
 
 	m->addEdgeByReference(germany, france);
 
-	Country* e = m->setPlayerOwnership(25, "Ethiopia");
-
-	Country* g = m->setPlayerOwnership(41, "Germany");
-
 	// true!!!!
 	isValidMap = m->validate();
 
-	cout << "END" << endl;
+	GameEngine engine;
 
-	cout << *m;
+	vector<Player*> players;
+	players.push_back(new Player());
+	players.push_back(new Player());
 
-	cout << *e;
+	engine.smallGameStart(m, players);
 
-	cout << *g;
-	cout << *africa;
+	Country* e = m->setPlayerOwnership(0, "Ethiopia");
 
-	MapComponent* mc = dynamic_cast<MapComponent*>(france);
+	Country* g = m->setPlayerOwnership(1, "Germany");
 
-	cout << *mc;
+	africa->setBonus(5);
 
+	e = m->setPlayerOwnership(0, "Kenya");
+
+	engine.reinforcementPhase();
+	engine.issueOrdersPhase();
+	engine.executeOrdersPhase();
 
 
 	return 0;
